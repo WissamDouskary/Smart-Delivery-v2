@@ -1,5 +1,7 @@
 package com.smartlogi.model;
 
+import com.smartlogi.enums.Priority;
+import com.smartlogi.enums.Status;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -41,6 +43,13 @@ public class Colis {
 
     @OneToMany(mappedBy = "colis")
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
+
+    @org.hibernate.annotations.ColumnDefault("'CREATED'")
+    @Column(name = "status", columnDefinition = "order_status not null")
+    private Status status;
+
+    @Column(name = "priority", columnDefinition = "order_priority not null")
+    private Priority priority;
 
     @ManyToMany
     @JoinTable(
@@ -114,17 +123,4 @@ public class Colis {
     public void setId(Long id) {
         this.id = id;
     }
-/*
- TODO [Reverse Engineering] create field to map the 'status' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @org.hibernate.annotations.ColumnDefault("'CREATED'")
-    @Column(name = "status", columnDefinition = "order_status not null")
-    private java.lang.Object status;
-*/
-/*
- TODO [Reverse Engineering] create field to map the 'priority' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @Column(name = "priority", columnDefinition = "order_priority not null")
-    private java.lang.Object priority;
-*/
 }
