@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9
+      author: wissam
+      changes:
+        - sql:
+            sql:
+              CREATE TYPE order_status AS ENUM ('CREATED', 'COLLECTED', 'IN_STOCK', 'LIVRED');
+        - addColumn:
+            tableName: colis
+            columns:
+              - column:
+                  name: status
+                  type: order_status
+                  defaultValue: CREATED
+                  constraints:
+                    nullable: false

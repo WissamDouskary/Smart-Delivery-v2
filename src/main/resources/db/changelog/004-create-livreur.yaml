@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: wissam
+      changes:
+        - createTable:
+            tableName: livreurs
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: nom
+                  type: varchar(225)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prenom
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telephone
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: vehicle
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: livreurs
+            baseColumnNames: city_id
+            referencedTableName: zones
+            referencedColumnNames: id
+            constraintName: fk_livreurs_zones

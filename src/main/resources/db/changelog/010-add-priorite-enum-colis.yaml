@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 10
+      author: wissam
+      changes:
+        - sql:
+            sql:
+              CREATE TYPE order_priority AS ENUM ('URGENT', 'NORMALE', 'NON_URGENT')
+        - addColumn:
+            tableName: colis
+            columns:
+              - column:
+                  name: priority
+                  type: order_priority
+                  constraints:
+                    nullable: false

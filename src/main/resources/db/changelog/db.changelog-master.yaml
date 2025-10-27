@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-create-sender.yaml
+  - include:
+      file: db/changelog/002-create-receiver.yaml
+  - include:
+      file: db/changelog/003-create-zone.yaml
+  - include:
+      file: db/changelog/004-create-livreur.yaml
+  - include:
+      file: db/changelog/005-create-colis.yaml
+  - include:
+      file: db/changelog/006-create_products.yaml
+  - include:
+      file: db/changelog/007-create-colis_products.yaml
+  - include:
+      file: db/changelog/008-create-historic_Livraison.yaml
+  - include:
+      file: db/changelog/009-add-status-colis.yaml
+  - include:
+      file: db/changelog/010-add-priorite-enum-colis.yaml

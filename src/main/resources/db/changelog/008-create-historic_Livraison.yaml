@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: wissam
+      changes:
+        - createTable:
+            tableName: historic_livraison
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: changementDate
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: varchar(255)

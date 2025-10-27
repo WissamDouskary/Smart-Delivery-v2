@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: wissam
+      changes:
+        - createTable:
+            tableName: colis
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: description
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: poids
+                  type: double
+                  constraints:
+                    nullable: false
+              - column:
+                  name: vileDistination
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: receiver_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sender_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: livreur_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: receiver_id
+            referencedTableName: receivers
+            referencedColumnNames: id
+            constraintName: fk_colis_receivers
+
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: sender_id
+            referencedTableName: senders
+            referencedColumnNames: id
+            constraintName: fk_colis_senders
+
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: livreur_id
+            referencedTableName: livreurs
+            referencedColumnNames: id
+            constraintName: fk_colis_livreurs
+
+        - addForeignKeyConstraint:
+            baseTableName: colis
+            baseColumnNames: city_id
+            referencedTableName: zones
+            referencedColumnNames: id
+            constraintName: fk_colis_zones
+
