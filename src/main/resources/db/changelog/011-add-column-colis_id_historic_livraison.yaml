@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11
+      author: wissam
+      changes:
+        - addColumn:
+            tableName: historic_livraison
+            columns:
+              - column:
+                  name: colis_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: historic_livraison
+            baseColumnNames: colis_id
+            referencedTableName: colis
+            referencedColumnNames: id
+            constraintName: fk_historic_livraison_colis

@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/009-add-status-colis.yaml
   - include:
       file: db/changelog/010-add-priorite-enum-colis.yaml
+  - include:
+      file: db/changelog/011-add-column-colis_id_historic_livraison.yaml
