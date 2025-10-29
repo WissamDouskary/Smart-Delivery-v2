@@ -11,9 +11,9 @@ import java.util.Set;
 @Table(name = "products")
 public class Products {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "nom", nullable = false)
     private String nom;
@@ -70,11 +70,11 @@ public class Products {
         this.nom = nom;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

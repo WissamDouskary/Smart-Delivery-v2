@@ -2,19 +2,26 @@ package com.smartlogi.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Entity
 @Table(name = "zones")
 public class Zone {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "nom", nullable = false)
     private String nom;
 
-    @Column(name = "codePostal", nullable = false)
+    @Column(name = "code_postal", nullable = false)
     private Integer codePostal;
+
+    @OneToMany(mappedBy = "city")
+    private List<Colis> colisList = new ArrayList<>();
 
     public Integer getCodePostal() {
         return codePostal;
@@ -32,11 +39,19 @@ public class Zone {
         this.nom = nom;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public List<Colis> getColisList() {
+        return colisList;
+    }
+
+    public void setColisList(List<Colis> colisList) {
+        this.colisList = colisList;
     }
 }

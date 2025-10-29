@@ -9,9 +9,9 @@ import java.time.Instant;
 public class HistoriqueLivraison {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "status", nullable = false)
     private String status;
@@ -58,11 +58,11 @@ public class HistoriqueLivraison {
         this.status = status;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

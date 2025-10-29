@@ -9,8 +9,8 @@ import java.util.List;
 @Table(name = "receivers")
 public class Receiver {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private String nom;
     private String prenom;
     private String email;
@@ -20,11 +20,11 @@ public class Receiver {
     @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
     private List<Colis> colisList = new ArrayList<>();
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

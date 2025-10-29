@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "colis_products")
 public class ColisProduct {
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -16,11 +17,11 @@ public class ColisProduct {
     @JoinColumn(name = "colis_id")
     private Colis colis;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

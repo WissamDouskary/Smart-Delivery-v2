@@ -6,9 +6,9 @@ import jakarta.persistence.*;
 @Table(name = "livreurs")
 public class Livreur {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "nom", nullable = false, length = 225)
     private String nom;
@@ -66,11 +66,11 @@ public class Livreur {
         this.nom = nom;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

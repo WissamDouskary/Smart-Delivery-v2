@@ -1,16 +1,18 @@
 package com.smartlogi.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "senders")
 public class Sender {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private String nom;
     private String prenom;
     private String email;
@@ -21,6 +23,22 @@ public class Sender {
     private List<Colis> colisList = new ArrayList<>();
 
     public Sender(){}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public List<Colis> getColisList() {
+        return colisList;
+    }
+
+    public void setColisList(List<Colis> colisList) {
+        this.colisList = colisList;
+    }
 
     public String getNom() {
         return nom;

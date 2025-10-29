@@ -3,18 +3,20 @@ package com.smartlogi.model;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "colis")
 public class Colis {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "description", nullable = false)
     private String description;
@@ -33,8 +35,8 @@ public class Colis {
     @JoinColumn(name = "sender_id", nullable = false)
     private Sender sender;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "livreur_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "livreur_id")
     private Livreur livreur;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -44,11 +46,12 @@ public class Colis {
     @OneToMany(mappedBy = "colis")
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
 
-    @org.hibernate.annotations.ColumnDefault("'CREATED'")
-    @Column(name = "status", columnDefinition = "order_status not null")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status;
 
-    @Column(name = "priority", columnDefinition = "order_priority not null")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Priority priority;
 
     @ManyToMany
@@ -66,6 +69,38 @@ public class Colis {
 
     public void setCity(Zone city) {
         this.city = city;
+    }
+
+    public List<HistoriqueLivraison> getHistoriqueLivraisonList() {
+        return historiqueLivraisonList;
+    }
+
+    public void setHistoriqueLivraisonList(List<HistoriqueLivraison> historiqueLivraisonList) {
+        this.historiqueLivraisonList = historiqueLivraisonList;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public List<Products> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Products> products) {
+        this.products = products;
     }
 
     public Livreur getLivreur() {
@@ -116,11 +151,11 @@ public class Colis {
         this.description = description;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
