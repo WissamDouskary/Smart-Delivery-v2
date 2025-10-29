@@ -8,8 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: bigint
-                  autoIncrement: true
+                  type: VARCHAR(36)
                   constraints:
                     primaryKey: true
               - column:
@@ -29,22 +28,22 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: receiver_id
-                  type: bigint
+                  type: VARCHAR(36)
                   constraints:
                     nullable: false
               - column:
                   name: sender_id
-                  type: bigint
+                  type: VARCHAR(36)
                   constraints:
                     nullable: false
               - column:
                   name: livreur_id
-                  type: bigint
+                  type: VARCHAR(36)
                   constraints:
                     nullable: false
               - column:
                   name: city_id
-                  type: bigint
+                  type: VARCHAR(36)
                   constraints:
                     nullable: false
 

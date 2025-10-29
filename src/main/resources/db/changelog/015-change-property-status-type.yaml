@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-10-28-01
+      author: wissam
+      changes:
+        - renameColumn:
+            tableName: colis
+            oldColumnName: priority
+            newColumnName: priority_old
+            columnDataType: order_priority
+
+        - renameColumn:
+            tableName: colis
+            oldColumnName: status
+            newColumnName: status_old
+            columnDataType: order_status
+
+        - addColumn:
+            tableName: colis
+            columns:
+              - column:
+                  name: priority
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+        - sql:
+            sql: |
+              UPDATE colis
+              SET priority = priority_old::text,
+                  status = status_old::text;
+
+        - dropColumn:
+            tableName: colis
+            columnName: priority_old
+
+        - dropColumn:
+            tableName: colis
+            columnName: status_old
+
+        - sql:
+            sql: |
+              DROP TYPE IF EXISTS order_priority;
+              DROP TYPE IF EXISTS order_status;

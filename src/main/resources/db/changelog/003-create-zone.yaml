@@ -8,8 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: bigint
-                  autoIncrement: true
+                  type: VARCHAR(36)
                   constraints:
                     primaryKey: true
               - column:
@@ -18,7 +17,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: codePostal
+                  name: code_postal
                   type: integer
                   constraints:
                     nullable: false

@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 13
+      author: wissam
+      changes:
+        - insert:
+            tableName: zones
+            columns:
+              - column: {name: nom, value: 'casablance'}
+              - column: {name: codePostal, valueNumeric: '10000'}
+        - insert:
+            tableName: zones
+            columns:
+              - column: { name: nom, value: 'safi' }
+              - column: { name: codePostal, valueNumeric: '40000' }
+
+        - insert:
+            tableName: zones
+            columns:
+              - column: { name: nom, value: 'agadir' }
+              - column: { name: codePostal, valueNumeric: '15000' }
