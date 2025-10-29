@@ -20,4 +20,10 @@ databaseChangeLog:
   - include:
       file: db/changelog/010-add-priorite-enum-colis.yaml
   - include:
-      file: db/changelog/011-add-column-colis_id_historic_livraison.yaml
+      file: db/changelog/012-modify-livreur-id-nullable.yaml
+#  - include:
+#      file: db/changelog/013-insert-zones.yaml
+  - include:
+      file: db/changelog/014-change-villeDistination.yaml
+  - include:
+      file: db/changelog/015-change-property-status-type.yaml
