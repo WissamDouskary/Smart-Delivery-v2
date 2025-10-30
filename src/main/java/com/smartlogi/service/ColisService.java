@@ -5,6 +5,7 @@ import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ReceiverResponseDTO;
 import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
+import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ColisMapper;
 import com.smartlogi.mapper.ReceiverMapper;
 import com.smartlogi.mapper.SenderMapper;
@@ -15,6 +16,8 @@ import com.smartlogi.model.Sender;
 import com.smartlogi.repository.ColisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ColisService {
@@ -60,4 +63,11 @@ public class ColisService {
         return colisMapper.toDTO(saved);
     }
 
+    public List<ColisResponseDTO> findAllColisForClient(String sender_id){
+        List<Colis> colisList = colisRepository.findColisBySender_Id(sender_id);
+        if(colisList.isEmpty()){
+            throw new ResourceNotFoundException("Aucun Colis pour ce client");
+        }
+        return colisMapper.toResponseDTOList(colisList);
+    }
 }

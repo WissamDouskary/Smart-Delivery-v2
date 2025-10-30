@@ -7,12 +7,10 @@ import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,4 +28,12 @@ public class ColisController {
         ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis ajouter avec succes", saved);
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/client/{id}")
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(@PathVariable("id") String sender_id){
+        List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForClient(sender_id);
+        ApiResponse<List<ColisResponseDTO>> listApiResponse = new ApiResponse<>("Colis Fetched avec succes", colisResponseDTOList);
+        return ResponseEntity.ok(listApiResponse);
+    }
+
 }

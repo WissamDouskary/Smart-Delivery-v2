@@ -11,7 +11,6 @@ public class ZoneResponseDTO {
     private String id;
     private String nom;
     private Integer codePostal;
-    private List<Colis> colisList = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -35,13 +34,5 @@ public class ZoneResponseDTO {
 
     public void setCodePostal(Integer codePostal) {
         this.codePostal = codePostal;
-    }
-
-    public List<Colis> getColisList() {
-        return colisList;
-    }
-
-    public void setColisList(List<Colis> colisList) {
-        this.colisList = colisList;
     }
 }
