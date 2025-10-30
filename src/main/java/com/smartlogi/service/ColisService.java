@@ -2,19 +2,20 @@ package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
+import com.smartlogi.exception.OperationNotAllowedException;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ColisMapper;
 import com.smartlogi.mapper.ReceiverMapper;
 import com.smartlogi.mapper.SenderMapper;
 import com.smartlogi.mapper.ZoneMapper;
 import com.smartlogi.model.Colis;
+import com.smartlogi.model.Livreur;
 import com.smartlogi.model.Receiver;
 import com.smartlogi.model.Sender;
 import com.smartlogi.repository.ColisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,9 +28,10 @@ public class ColisService {
     private ZoneMapper zoneMapper;
     private ReceiverMapper receiverMapper;
     private SenderMapper senderMapper;
+    private LivreurService livreurService;
 
     @Autowired
-    public ColisService(ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
+    public ColisService(LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
         this.senderService = senderService;
@@ -38,6 +40,7 @@ public class ColisService {
         this.zoneMapper = zoneMapper;
         this.receiverMapper = receiverMapper;
         this.senderMapper = senderMapper;
+        this.livreurService = livreurService;
     }
 
     public ColisResponseDTO saveColis(ColisRequestDTO dto){
@@ -52,9 +55,15 @@ public class ColisService {
 
         Receiver receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
         Sender senderEntity = senderService.findEntityById(dto.getSender().getId());
+        Livreur livreur = livreurService.findById(dto.getLivreur().getId());
+
+        if(!cityDTO.getId().equals(livreur.getCity().getId())){
+            throw new OperationNotAllowedException("Tu doit choisi une livreur avec le meme ville du colis!");
+        }
 
         colis.setReceiver(receiverEntity);
         colis.setSender(senderEntity);
+        colis.setLivreur(livreur);
 
         Colis saved = colisRepository.save(colis);
 

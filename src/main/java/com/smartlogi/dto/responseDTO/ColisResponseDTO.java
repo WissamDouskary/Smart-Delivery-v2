@@ -14,7 +14,7 @@ public class ColisResponseDTO {
     private String vileDistination;
     private ReceiverResponseDTO receiver;
     private SenderResponseDTO sender;
-    private Livreur livreur;
+    private LivreurResponseDTO livreur;
     private ZoneResponseDTO city;
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
     private Status status;
@@ -68,11 +68,11 @@ public class ColisResponseDTO {
         this.sender = sender;
     }
 
-    public Livreur getLivreur() {
+    public LivreurResponseDTO getLivreur() {
         return livreur;
     }
 
-    public void setLivreur(Livreur livreur) {
+    public void setLivreur(LivreurResponseDTO livreur) {
         this.livreur = livreur;
     }
 

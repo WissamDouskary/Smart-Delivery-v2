@@ -2,6 +2,7 @@ package com.smartlogi.dto.requestsDTO;
 
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
+import com.smartlogi.model.Livreur;
 import com.smartlogi.model.Receiver;
 import com.smartlogi.model.Sender;
 import com.smartlogi.model.Zone;
@@ -25,6 +26,9 @@ public class ColisRequestDTO {
 
     @NotNull(message = "Le sender ne peut pas être vide")
     private Sender sender;
+
+    @NotNull(message = "Le Livreur ne peut pas être vide")
+    private Livreur livreur;
 
     @NotNull(message = "La city ne peut pas être vide")
     private Zone city;
@@ -89,5 +93,13 @@ public class ColisRequestDTO {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public Livreur getLivreur() {
+        return livreur;
+    }
+
+    public void setLivreur(Livreur livreur) {
+        this.livreur = livreur;
     }
 }
