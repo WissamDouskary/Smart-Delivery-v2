@@ -4,9 +4,11 @@ import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
+import com.smartlogi.enums.Status;
 import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +53,15 @@ public class ColisController {
         List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForLivreurs(livreur_id);
 
         ApiResponse<List<ColisResponseDTO>> apiResponse = new ApiResponse<>("colis recu avec succes!", colisResponseDTOList);
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("{colis_id}/livreur/{livreur_id}")
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColisByLivreur(@PathVariable("colis_id") String colis_id, @PathVariable("livreur_id") String livreur_id, @RequestBody Status status){
+        ColisResponseDTO colisResponseDTO = colisService.updateColisByLivreur(livreur_id, status, colis_id);
+
+        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis modifier avec succes!", colisResponseDTO);
 
         return ResponseEntity.ok(apiResponse);
     }

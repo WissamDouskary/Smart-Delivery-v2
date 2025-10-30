@@ -2,6 +2,7 @@ package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
+import com.smartlogi.enums.Status;
 import com.smartlogi.exception.OperationNotAllowedException;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ColisMapper;
@@ -64,6 +65,34 @@ public class ColisService {
         colis.setReceiver(receiverEntity);
         colis.setSender(senderEntity);
         colis.setLivreur(livreur);
+
+        Colis saved = colisRepository.save(colis);
+
+        return colisMapper.toDTO(saved);
+    }
+
+    public ColisResponseDTO updateColisByLivreur(String livreur_id, Status status, String colis_id){
+        Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
+        Livreur livreur = livreurService.findById(livreur_id);
+
+        if(!livreur.getId().equals(colis.getLivreur().getId())){
+            throw new OperationNotAllowedException("You can't change statut for colis not assigned to you!");
+        }
+
+//        ColisResponseDTO colisDto = colisMapper.toDTO(colis);
+//
+//        dto.setSender(colisDto.getSender());
+//        dto.setDescription(colisDto.getDescription());
+//        dto.setCity(colisDto.getCity());
+//        dto.setHistoriqueLivraisonList(colisDto.getHistoriqueLivraisonList());
+//        dto.setId(colisDto.getId());
+//        dto.setLivreur(colisDto.getLivreur());
+//        dto.setPoids(colisDto.getPoids());
+//        dto.setPriority(colisDto.getPriority());
+//        dto.setVileDistination(colisDto.getCity().getNom());
+//        dto.setReceiver(colisDto.getReceiver());
+
+        colis.setStatus(status);
 
         Colis saved = colisRepository.save(colis);
 
