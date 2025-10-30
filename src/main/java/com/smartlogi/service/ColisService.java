@@ -1,10 +1,7 @@
 package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.dto.responseDTO.ColisResponseDTO;
-import com.smartlogi.dto.responseDTO.ReceiverResponseDTO;
-import com.smartlogi.dto.responseDTO.SenderResponseDTO;
-import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
+import com.smartlogi.dto.responseDTO.*;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ColisMapper;
 import com.smartlogi.mapper.ReceiverMapper;
@@ -17,6 +14,7 @@ import com.smartlogi.repository.ColisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -69,5 +67,21 @@ public class ColisService {
             throw new ResourceNotFoundException("Aucun Colis pour ce client");
         }
         return colisMapper.toResponseDTOList(colisList);
+    }
+
+    public List<ColisSummaryDTO> findAllColisForReciever(String reciever_id){
+        List<Colis> colisList = colisRepository.findColisByReceiver_Id(reciever_id);
+        if (colisList.isEmpty()) {
+            throw new ResourceNotFoundException("No colis found for this receiver");
+        }
+
+        List<ColisSummaryDTO> colisResponseDTOList = colisList.stream().map(c -> {
+            ColisSummaryDTO dto = new ColisSummaryDTO();
+            dto.setSender(senderMapper.toResponseDTO(c.getSender()));
+            dto.setStatus(c.getStatus());
+            return dto;
+        }).toList();
+
+        return colisResponseDTOList;
     }
 }

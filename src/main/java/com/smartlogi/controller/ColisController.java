@@ -3,6 +3,7 @@ package com.smartlogi.controller;
 import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
+import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
 import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
 import jakarta.validation.Valid;
@@ -36,4 +37,12 @@ public class ColisController {
         return ResponseEntity.ok(listApiResponse);
     }
 
+    @GetMapping("/receiver/{id}")
+    public ResponseEntity<ApiResponse<List<ColisSummaryDTO>>> findAllColisForReceiver(@PathVariable("id") String receiver_id){
+        List<ColisSummaryDTO> colisResponseDTOList = colisService.findAllColisForReciever(receiver_id);
+
+        ApiResponse<List<ColisSummaryDTO>> apiResponse = new ApiResponse<>("Receiver colis donner avec succes!", colisResponseDTOList);
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }
