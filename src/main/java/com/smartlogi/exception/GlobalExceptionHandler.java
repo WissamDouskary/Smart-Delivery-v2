@@ -31,6 +31,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
+    // operation not allowed
+    @ExceptionHandler(OperationNotAllowedException.class)
+    public ResponseEntity<ApiResponse<String>> handleOperationNotAllowed(OperationNotAllowedException exception){
+        ApiResponse<String> apiResponse = new ApiResponse<>(exception.getMessage(), null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
     // Generic exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGenericException(Exception ex) {
