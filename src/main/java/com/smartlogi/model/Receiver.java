@@ -1,5 +1,8 @@
 package com.smartlogi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ public class Receiver {
     private String adresse;
 
     @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
+    @JsonManagedReference("receiver-colis")
     private List<Colis> colisList = new ArrayList<>();
 
     public void setId(String id) {

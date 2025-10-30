@@ -1,5 +1,7 @@
 package com.smartlogi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import jakarta.persistence.*;
@@ -29,18 +31,22 @@ public class Colis {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
+    @JsonBackReference("receiver-colis")
     private Receiver receiver;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
+    @JsonBackReference("sender-colis")
     private Sender sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "livreur_id")
+    @JsonBackReference("livreur-colis")
     private Livreur livreur;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "city_id", nullable = false)
+    @JsonBackReference("zone-colis")
     private Zone city;
 
     @OneToMany(mappedBy = "colis")

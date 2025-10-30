@@ -1,6 +1,11 @@
 package com.smartlogi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "livreurs")
@@ -25,6 +30,18 @@ public class Livreur {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "city_id", nullable = false)
     private Zone city;
+
+    @OneToMany(mappedBy = "livreur", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference("livreur-colis")
+    private List<Colis> colisList = new ArrayList<>();
+
+    public List<Colis> getColisList() {
+        return colisList;
+    }
+
+    public void setColisList(List<Colis> colisList) {
+        this.colisList = colisList;
+    }
 
     public Zone getCity() {
         return city;

@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ReceiverMapper.class, SenderMapper.class, ZoneMapper.class})
 public interface ColisMapper {
     Colis toEntity(ColisRequestDTO colisRequestDTO);
     ColisResponseDTO toDTO(Colis colis);

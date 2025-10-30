@@ -16,7 +16,7 @@ public class HistoriqueLivraison {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "changementDate", nullable = false)
+    @Column(name = "changement_date", nullable = false)
     private Instant changementDate;
 
     @Column(name = "comment")

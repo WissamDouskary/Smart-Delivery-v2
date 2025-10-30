@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 16
+      author: wissam
+      changes:
+        - renameColumn:
+            tableName: historic_livraison
+            oldColumnName: changementDate
+            newColumnName: changement_date
+            columnDataType: timestamp

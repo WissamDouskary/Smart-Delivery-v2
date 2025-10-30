@@ -30,4 +30,9 @@ public class ReceiverService {
         Receiver receiver = receiverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Aucun receiver avec ce id: "+id));
         return receiverMapper.toResponseDTO(receiver);
     }
+
+    public Receiver findEntityById(String id) {
+        return receiverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Receiver not found"));
+    }
 }

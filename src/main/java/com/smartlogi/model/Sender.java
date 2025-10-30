@@ -1,5 +1,7 @@
 package com.smartlogi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -20,6 +22,7 @@ public class Sender {
     private String adresse;
 
     @OneToMany(mappedBy = "sender")
+    @JsonManagedReference("sender-colis")
     private List<Colis> colisList = new ArrayList<>();
 
     public Sender(){}

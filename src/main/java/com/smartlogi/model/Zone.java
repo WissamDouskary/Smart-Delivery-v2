@@ -1,5 +1,8 @@
 package com.smartlogi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ public class Zone {
     private Integer codePostal;
 
     @OneToMany(mappedBy = "city")
+    @JsonManagedReference("zone-colis")
     private List<Colis> colisList = new ArrayList<>();
 
     public Integer getCodePostal() {

@@ -3,7 +3,6 @@ package com.smartlogi.dto.responseDTO;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import com.smartlogi.model.*;
-import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,10 @@ public class ColisResponseDTO {
     private String description;
     private Double poids;
     private String vileDistination;
-    private Receiver receiver;
-    private Sender sender;
+    private ReceiverResponseDTO receiver;
+    private SenderResponseDTO sender;
     private Livreur livreur;
-    private Zone city;
+    private ZoneResponseDTO city;
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
     private Status status;
     private Priority priority;
@@ -53,19 +52,19 @@ public class ColisResponseDTO {
         this.vileDistination = vileDistination;
     }
 
-    public Receiver getReceiver() {
+    public ReceiverResponseDTO getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(ReceiverResponseDTO receiver) {
         this.receiver = receiver;
     }
 
-    public Sender getSender() {
+    public SenderResponseDTO getSender() {
         return sender;
     }
 
-    public void setSender(Sender sender) {
+    public void setSender(SenderResponseDTO sender) {
         this.sender = sender;
     }
 
@@ -77,11 +76,11 @@ public class ColisResponseDTO {
         this.livreur = livreur;
     }
 
-    public Zone getCity() {
+    public ZoneResponseDTO getCity() {
         return city;
     }
 
-    public void setCity(Zone city) {
+    public void setCity(ZoneResponseDTO city) {
         this.city = city;
     }
 

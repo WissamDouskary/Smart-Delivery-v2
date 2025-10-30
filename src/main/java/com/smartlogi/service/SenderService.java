@@ -30,4 +30,9 @@ public class SenderService {
         Sender senderResponse = senderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Aucun sender avec id: "+id));
         return senderMapper.toResponseDTO(senderResponse);
     }
+
+    public Sender findEntityById(String id) {
+        return senderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+    }
 }
