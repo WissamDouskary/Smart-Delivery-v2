@@ -38,6 +38,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    //unauthorized
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<String>> handleAccessDenied(AccessDeniedException exception){
+        ApiResponse<String> apiResponse = new ApiResponse<>(exception.getMessage(), null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+    }
+
     // Generic exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGenericException(Exception ex) {
