@@ -57,11 +57,20 @@ public class ColisController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("{colis_id}/livreur/{livreur_id}")
+    @PatchMapping("{colis_id}/livreur/{livreur_id}")
     public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColisByLivreur(@PathVariable("colis_id") String colis_id, @PathVariable("livreur_id") String livreur_id, @RequestBody Status status){
         ColisResponseDTO colisResponseDTO = colisService.updateColisByLivreur(livreur_id, status, colis_id);
 
         ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis modifier avec succes!", colisResponseDTO);
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PatchMapping("/affect/{colis_id}/livreur/{livreur_id}")
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> affectColisToLivreur(@PathVariable("colis_id") String colis_id, @PathVariable("livreur_id") String livreur_id){
+        ColisResponseDTO colisResponseDTO = colisService.affectColisToLivreur(livreur_id, colis_id);
+
+        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis affected to livreur ", colisResponseDTO);
 
         return ResponseEntity.ok(apiResponse);
     }

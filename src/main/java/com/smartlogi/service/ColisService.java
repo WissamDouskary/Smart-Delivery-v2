@@ -1,6 +1,7 @@
 package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
+import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
 import com.smartlogi.enums.Status;
 import com.smartlogi.exception.OperationNotAllowedException;
@@ -56,14 +57,27 @@ public class ColisService {
 
         Receiver receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
         Sender senderEntity = senderService.findEntityById(dto.getSender().getId());
-        Livreur livreur = livreurService.findById(dto.getLivreur().getId());
-
-        if(!cityDTO.getId().equals(livreur.getCity().getId())){
-            throw new OperationNotAllowedException("Tu doit choisi une livreur avec le meme ville du colis!");
-        }
 
         colis.setReceiver(receiverEntity);
         colis.setSender(senderEntity);
+
+        Colis saved = colisRepository.save(colis);
+
+        return colisMapper.toDTO(saved);
+    }
+
+    public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){
+        Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
+        Livreur livreur = livreurService.findById(livreur_id);
+
+        if(colis.getLivreur() != null && livreur.getId().equals(colis.getLivreur().getId())){
+            throw new OperationNotAllowedException("livreur est deja affecter sur ce Colis");
+        }
+
+        if(livreur.getCity().equals(colis.getCity())){
+            throw new OperationNotAllowedException("livreur ville est different de colis ville!");
+        }
+
         colis.setLivreur(livreur);
 
         Colis saved = colisRepository.save(colis);
@@ -78,20 +92,6 @@ public class ColisService {
         if(!livreur.getId().equals(colis.getLivreur().getId())){
             throw new OperationNotAllowedException("You can't change statut for colis not assigned to you!");
         }
-
-//        ColisResponseDTO colisDto = colisMapper.toDTO(colis);
-//
-//        dto.setSender(colisDto.getSender());
-//        dto.setDescription(colisDto.getDescription());
-//        dto.setCity(colisDto.getCity());
-//        dto.setHistoriqueLivraisonList(colisDto.getHistoriqueLivraisonList());
-//        dto.setId(colisDto.getId());
-//        dto.setLivreur(colisDto.getLivreur());
-//        dto.setPoids(colisDto.getPoids());
-//        dto.setPriority(colisDto.getPriority());
-//        dto.setVileDistination(colisDto.getCity().getNom());
-//        dto.setReceiver(colisDto.getReceiver());
-
         colis.setStatus(status);
 
         Colis saved = colisRepository.save(colis);
