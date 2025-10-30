@@ -45,4 +45,13 @@ public class ColisController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/livreur/{id}")
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColisByLivreur_Id(@PathVariable("id") String livreur_id){
+        List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForLivreurs(livreur_id);
+
+        ApiResponse<List<ColisResponseDTO>> apiResponse = new ApiResponse<>("colis recu avec succes!", colisResponseDTOList);
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }

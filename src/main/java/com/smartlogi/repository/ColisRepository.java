@@ -10,4 +10,5 @@ import java.util.List;
 public interface ColisRepository extends JpaRepository<Colis, String> {
     List<Colis> findColisBySender_Id(String senderId);
     List<Colis> findColisByReceiver_Id(String receiverId);
+    List<Colis> findColisByLivreur_Id(String livreurId);
 }

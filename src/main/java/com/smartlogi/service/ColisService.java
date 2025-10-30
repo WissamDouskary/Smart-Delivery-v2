@@ -93,4 +93,12 @@ public class ColisService {
 
         return colisResponseDTOList;
     }
+
+    public List<ColisResponseDTO> findAllColisForLivreurs(String livreur_id){
+        List<Colis> colisList = colisRepository.findColisByLivreur_Id(livreur_id);
+        if(colisList.isEmpty()){
+            throw new ResourceNotFoundException("Aucun Colis pour livreur avec id: "+livreur_id);
+        }
+        return colisMapper.toResponseDTOList(colisList);
+    }
 }
