@@ -118,6 +118,12 @@ public class ColisService {
         Colis updated = colisRepository.save(colis);
         return colisMapper.toDTO(updated);
     }
+
+    public void deleteColis(String colis_id){
+        Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
+        colisRepository.delete(colis);
+    }
+
     public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){
         Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
         Livreur livreur = livreurService.findEntityById(livreur_id);

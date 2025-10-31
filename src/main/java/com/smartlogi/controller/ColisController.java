@@ -83,4 +83,10 @@ public class ColisController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colis_id){
+        colisService.deleteColis(colis_id);
+        return ResponseEntity.ok(new ApiResponse("Colis supprimer avec succes!", null));
+    }
 }
