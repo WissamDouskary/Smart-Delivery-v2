@@ -4,17 +4,18 @@ import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
+import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
-import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/colis")
@@ -33,10 +34,17 @@ public class ColisController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColis(){
-        List<ColisResponseDTO> colisResponseDTOList = colisService.findAll();
+    public ResponseEntity<ApiResponse<Page<ColisResponseDTO>>> findAllColis(
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) String zone,
+            @RequestParam(required = false) String ville,
+            @RequestParam(required = false) Priority priority,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Pageable pageable
+    ){
+        Page<ColisResponseDTO> colisResponseDTOList = colisService.findAllWithFilter(status, zone, ville, priority, date, pageable);
 
-        ApiResponse<List<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
+        ApiResponse<Page<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
 
         return ResponseEntity.ok(apiResponse);
     }

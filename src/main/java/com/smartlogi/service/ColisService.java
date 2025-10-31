@@ -3,6 +3,7 @@ package com.smartlogi.service;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
+import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import com.smartlogi.exception.AccessDeniedException;
 import com.smartlogi.exception.OperationNotAllowedException;
@@ -11,8 +12,12 @@ import com.smartlogi.mapper.*;
 import com.smartlogi.model.*;
 import com.smartlogi.repository.ColisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -124,12 +129,28 @@ public class ColisService {
         colisRepository.delete(colis);
     }
 
-    public List<ColisResponseDTO> findAll(){
-        List<Colis> colisList = colisRepository.findAll();
-        if(colisList.isEmpty()){
-            throw new ResourceNotFoundException("La liste des colis est vide!");
+    public Page<ColisResponseDTO> findAllWithFilter(
+            Status status,
+            String zone,
+            String ville,
+            Priority priority,
+            LocalDate date,
+            Pageable pageable
+    ){
+        Page<Colis> page = colisRepository.findAll(pageable);
+
+        List<ColisResponseDTO> filtered = page.getContent()
+                .stream()
+                .filter(c -> status == null || c.getStatus() == status)
+                .filter(c -> priority == null || c.getPriority() == priority)
+                .filter(c -> ville == null || c.getVileDistination().equalsIgnoreCase(ville))
+                .filter(c -> zone == null || (c.getCity() != null && c.getCity().getNom().equalsIgnoreCase(zone)))
+                .map(colisMapper::toDTO)
+                .toList();
+        if(filtered.isEmpty()){
+            throw new ResourceNotFoundException("Aucun colis, essayer de changer le filter");
         }
-        return colisMapper.toResponseDTOList(colisList);
+        return new PageImpl<>(filtered, pageable, filtered.size());
     }
 
     public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){
