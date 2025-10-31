@@ -11,6 +11,7 @@ import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.*;
 import com.smartlogi.model.*;
 import com.smartlogi.repository.ColisRepository;
+import com.smartlogi.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +36,10 @@ public class ColisService {
     private SenderMapper senderMapper;
     private LivreurService livreurService;
     private LivreurMapper livreurMapper;
+    private ProductRepository productRepository;
 
     @Autowired
-    public ColisService(LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
+    public ColisService(ProductRepository productRepository, LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
         this.senderService = senderService;
@@ -48,6 +50,7 @@ public class ColisService {
         this.senderMapper = senderMapper;
         this.livreurService = livreurService;
         this.livreurMapper = livreurMapper;
+        this.productRepository = productRepository;
     }
 
     public ColisResponseDTO saveColis(ColisRequestDTO dto){
@@ -62,9 +65,11 @@ public class ColisService {
 
         Receiver receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
         Sender senderEntity = senderService.findEntityById(dto.getSender().getId());
+        List<Products> products = productRepository.findAllById(dto.getProductIds());
 
         colis.setReceiver(receiverEntity);
         colis.setSender(senderEntity);
+        colis.setProducts(products);
 
         Colis saved = colisRepository.save(colis);
 

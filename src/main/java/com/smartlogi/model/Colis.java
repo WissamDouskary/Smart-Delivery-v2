@@ -67,7 +67,7 @@ public class Colis {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
 
-    private List<Products> products = new ArrayList<>();
+    private List<Products> products;
 
     public Zone getCity() {
         return city;

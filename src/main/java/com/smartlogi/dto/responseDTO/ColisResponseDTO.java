@@ -17,8 +17,17 @@ public class ColisResponseDTO {
     private LivreurResponseDTO livreur;
     private ZoneResponseDTO city;
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
+    private List<ProductResponseDTO> productsList = new ArrayList<>();
     private Status status;
     private Priority priority;
+
+    public List<ProductResponseDTO> getProductsList() {
+        return productsList;
+    }
+
+    public void setProductsList(List<ProductResponseDTO> productsList) {
+        this.productsList = productsList;
+    }
 
     public String getId() {
         return id;

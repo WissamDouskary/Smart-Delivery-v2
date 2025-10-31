@@ -9,13 +9,10 @@ import com.smartlogi.repository.ColisRepository;
 import com.smartlogi.repository.LivreurRepository;
 import com.smartlogi.repository.ReceiverRepository;
 import com.smartlogi.repository.SenderRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SearchService {

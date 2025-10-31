@@ -2,14 +2,14 @@ package com.smartlogi.dto.requestsDTO;
 
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
-import com.smartlogi.model.Livreur;
-import com.smartlogi.model.Receiver;
-import com.smartlogi.model.Sender;
-import com.smartlogi.model.Zone;
+import com.smartlogi.model.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ColisRequestDTO {
 
@@ -27,6 +27,9 @@ public class ColisRequestDTO {
     @NotNull(message = "Le sender ne peut pas être vide")
     private Sender sender;
 
+    @NotNull(message = "Le Produit ne peut pas être vide")
+    private List<String> productIds;
+
     @NotNull(message = "La city ne peut pas être vide")
     private Zone city;
 
@@ -35,6 +38,14 @@ public class ColisRequestDTO {
 
     @NotNull(message = "La priority ne peut pas être vide")
     private Priority priority;
+
+    public List<String> getProductIds() {
+        return productIds;
+    }
+
+    public void setProductIds(List<String> productIds) {
+        this.productIds = productIds;
+    }
 
     public String getDescription() {
         return description;
