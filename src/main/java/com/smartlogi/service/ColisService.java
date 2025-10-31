@@ -18,7 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ColisService {
@@ -151,6 +154,36 @@ public class ColisService {
             throw new ResourceNotFoundException("Aucun colis, essayer de changer le filter");
         }
         return new PageImpl<>(filtered, pageable, filtered.size());
+    }
+
+    public Map<String, Object> getColisSummary() {
+        List<Colis> colisList = colisRepository.findAll();
+
+        Map<String, Long> groupByZone = colisList.stream()
+                .filter(c -> c.getCity() != null)
+                .collect(Collectors.groupingBy(
+                        c -> c.getCity().getNom(),
+                        Collectors.counting()
+                ));
+
+        Map<Status, Long> groupByStatus = colisList.stream()
+                .collect(Collectors.groupingBy(
+                        Colis::getStatus,
+                        Collectors.counting()
+                ));
+
+        Map<Priority, Long> groupByPriority = colisList.stream()
+                .collect(Collectors.groupingBy(
+                        Colis::getPriority,
+                        Collectors.counting()
+                ));
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("groupByZone", groupByZone);
+        summary.put("groupByStatus", groupByStatus);
+        summary.put("groupByPriority", groupByPriority);
+
+        return summary;
     }
 
     public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){

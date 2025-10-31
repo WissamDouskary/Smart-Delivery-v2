@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/colis")
@@ -47,6 +48,11 @@ public class ColisController {
         ApiResponse<Page<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getSummary() {
+        return ResponseEntity.ok(new ApiResponse<>("Regroupent completer avec succes", colisService.getColisSummary()));
     }
 
     @GetMapping("/client/{id}")
