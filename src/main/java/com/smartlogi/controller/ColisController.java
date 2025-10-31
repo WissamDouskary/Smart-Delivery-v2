@@ -32,6 +32,15 @@ public class ColisController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColis(){
+        List<ColisResponseDTO> colisResponseDTOList = colisService.findAll();
+
+        ApiResponse<List<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
     @GetMapping("/client/{id}")
     public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(@PathVariable("id") String sender_id){
         List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForClient(sender_id);

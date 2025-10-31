@@ -124,6 +124,14 @@ public class ColisService {
         colisRepository.delete(colis);
     }
 
+    public List<ColisResponseDTO> findAll(){
+        List<Colis> colisList = colisRepository.findAll();
+        if(colisList.isEmpty()){
+            throw new ResourceNotFoundException("La liste des colis est vide!");
+        }
+        return colisMapper.toResponseDTOList(colisList);
+    }
+
     public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){
         Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
         Livreur livreur = livreurService.findEntityById(livreur_id);
