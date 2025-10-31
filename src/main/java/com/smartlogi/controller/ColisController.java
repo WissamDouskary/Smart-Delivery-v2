@@ -74,4 +74,13 @@ public class ColisController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColis(@PathVariable("id") String colis_id, @RequestBody ColisResponseDTO colis){
+        ColisResponseDTO colisResponseDTO = colisService.updateColis(colis, colis_id);
+
+        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis modifier avec succes", colisResponseDTO);
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }

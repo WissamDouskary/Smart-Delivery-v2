@@ -4,16 +4,11 @@ import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
 import com.smartlogi.enums.Status;
+import com.smartlogi.exception.AccessDeniedException;
 import com.smartlogi.exception.OperationNotAllowedException;
 import com.smartlogi.exception.ResourceNotFoundException;
-import com.smartlogi.mapper.ColisMapper;
-import com.smartlogi.mapper.ReceiverMapper;
-import com.smartlogi.mapper.SenderMapper;
-import com.smartlogi.mapper.ZoneMapper;
-import com.smartlogi.model.Colis;
-import com.smartlogi.model.Livreur;
-import com.smartlogi.model.Receiver;
-import com.smartlogi.model.Sender;
+import com.smartlogi.mapper.*;
+import com.smartlogi.model.*;
 import com.smartlogi.repository.ColisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,9 +26,10 @@ public class ColisService {
     private ReceiverMapper receiverMapper;
     private SenderMapper senderMapper;
     private LivreurService livreurService;
+    private LivreurMapper livreurMapper;
 
     @Autowired
-    public ColisService(LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
+    public ColisService(LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
         this.senderService = senderService;
@@ -43,6 +39,7 @@ public class ColisService {
         this.receiverMapper = receiverMapper;
         this.senderMapper = senderMapper;
         this.livreurService = livreurService;
+        this.livreurMapper = livreurMapper;
     }
 
     public ColisResponseDTO saveColis(ColisRequestDTO dto){
@@ -66,9 +63,64 @@ public class ColisService {
         return colisMapper.toDTO(saved);
     }
 
+    public ColisResponseDTO updateColis(ColisResponseDTO dto, String colis_id) {
+        Colis colis = colisRepository.findById(colis_id)
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
+
+        Livreur livreurEntity = null;
+        if (dto.getLivreur() != null && dto.getLivreur().getId() != null) {
+            livreurEntity = livreurService.findEntityById(dto.getLivreur().getId());
+        } else {
+            livreurEntity = colis.getLivreur();
+        }
+
+        Sender senderEntity = null;
+        if (dto.getSender() != null && dto.getSender().getId() != null) {
+            senderEntity = senderService.findEntityById(dto.getSender().getId());
+        } else {
+            senderEntity = colis.getSender();
+        }
+
+        Receiver receiverEntity = null;
+        if (dto.getReceiver() != null && dto.getReceiver().getId() != null) {
+            receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
+        } else {
+            receiverEntity = colis.getReceiver();
+        }
+
+        Zone zone = null;
+        if (dto.getCity() != null && dto.getCity().getId() != null) {
+            ZoneResponseDTO zoneResponseDTO = cityService.findCityById(dto.getCity().getId());
+            zone = zoneMapper.toEntity(zoneResponseDTO);
+            if (dto.getVileDistination() != null && !dto.getVileDistination().equals(zone.getNom())) {
+                throw new AccessDeniedException("La ville destinataire doit être la même que celle du city id.");
+            }
+        } else {
+            zone = colis.getCity();
+        }
+
+        if (dto.getDescription() == null) dto.setDescription(colis.getDescription());
+        if (dto.getPoids() == null || dto.getPoids() == 0) dto.setPoids(colis.getPoids());
+        if (dto.getVileDistination() == null) dto.setVileDistination(zone.getNom());
+        if (dto.getStatus() == null) dto.setStatus(colis.getStatus());
+        if (dto.getPriority() == null) dto.setPriority(colis.getPriority());
+
+        colis.setDescription(dto.getDescription());
+        colis.setPoids(dto.getPoids());
+        colis.setVileDistination(zone.getNom());
+        colis.setStatus(dto.getStatus());
+        colis.setPriority(dto.getPriority());
+        colis.setSender(senderEntity);
+        colis.setReceiver(receiverEntity);
+        colis.setLivreur(livreurEntity);
+        colis.setCity(zone);
+
+        Colis updated = colisRepository.save(colis);
+        return colisMapper.toDTO(updated);
+    }
     public ColisResponseDTO affectColisToLivreur(String livreur_id, String colis_id){
         Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
-        Livreur livreur = livreurService.findById(livreur_id);
+        Livreur livreur = livreurService.findEntityById(livreur_id);
 
         if(colis.getLivreur() != null && livreur.getId().equals(colis.getLivreur().getId())){
             throw new OperationNotAllowedException("livreur est deja affecter sur ce Colis");
@@ -87,7 +139,7 @@ public class ColisService {
 
     public ColisResponseDTO updateColisByLivreur(String livreur_id, Status status, String colis_id){
         Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
-        Livreur livreur = livreurService.findById(livreur_id);
+        Livreur livreur = livreurService.findEntityById(livreur_id);
 
         if(!livreur.getId().equals(colis.getLivreur().getId())){
             throw new OperationNotAllowedException("You can't change statut for colis not assigned to you!");
