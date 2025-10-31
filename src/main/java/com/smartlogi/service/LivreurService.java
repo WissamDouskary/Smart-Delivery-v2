@@ -2,11 +2,13 @@ package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
 import com.smartlogi.dto.responseDTO.LivreurResponseDTO;
+import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.LivreurMapper;
 import com.smartlogi.mapper.ZoneMapper;
 import com.smartlogi.model.Livreur;
+import com.smartlogi.model.Sender;
 import com.smartlogi.model.Zone;
 import com.smartlogi.repository.LivreurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +36,12 @@ public class LivreurService {
         Livreur saved = livreurRepository.save(livreur);
         return livreurMapper.toDTO(saved);
     }
+    public LivreurResponseDTO findById(String id){
+        Livreur livreur = livreurRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Aucun sender avec id: "+id));
+        return livreurMapper.toDTO(livreur);
+    }
 
-    public Livreur findById(String id){
+    public Livreur findEntityById(String id){
         return livreurRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Livreur not found avec id: "+id));
     }
 }

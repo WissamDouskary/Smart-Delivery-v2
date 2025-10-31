@@ -3,11 +3,20 @@ package com.smartlogi.dto.responseDTO;
 import com.smartlogi.model.Zone;
 
 public class LivreurResponseDTO {
+    private String id;
     private String nom;
     private String prenom;
     private String telephone;
     private String vehicle;
     private ZoneResponseDTO city;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getNom() {
         return nom;
