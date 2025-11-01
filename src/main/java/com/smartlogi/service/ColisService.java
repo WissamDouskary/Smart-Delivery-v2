@@ -18,7 +18,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +79,14 @@ public class ColisService {
         colis.setSender(senderEntity);
         colis.setProducts(products);
 
+        HistoriqueLivraison historique = new HistoriqueLivraison();
+        historique.setStatus(colis.getStatus());
+        historique.setComment("Colis créé par le client");
+        historique.setChangementDate(Instant.now());
+        historique.setColis(colis);
+
+        colis.getHistoriqueLivraisonList().add(historique);
+
         Colis saved = colisRepository.save(colis);
 
         return colisMapper.toDTO(saved);
@@ -133,6 +143,14 @@ public class ColisService {
         colis.setReceiver(receiverEntity);
         colis.setLivreur(livreurEntity);
         colis.setCity(zone);
+
+        HistoriqueLivraison historique = new HistoriqueLivraison();
+        historique.setStatus(colis.getStatus());
+        historique.setComment("Colis modifier par le Gestionnaire logistique");
+        historique.setChangementDate(Instant.now());
+        historique.setColis(colis);
+
+        colis.getHistoriqueLivraisonList().add(historique);
 
         Colis updated = colisRepository.save(colis);
         return colisMapper.toDTO(updated);
@@ -211,6 +229,14 @@ public class ColisService {
 
         colis.setLivreur(livreur);
 
+        HistoriqueLivraison historique = new HistoriqueLivraison();
+        historique.setStatus(colis.getStatus());
+        historique.setComment("Colis affect au livreur nom: "+livreur.getNom() + " "+livreur.getPrenom());
+        historique.setChangementDate(Instant.now());
+        historique.setColis(colis);
+
+        colis.getHistoriqueLivraisonList().add(historique);
+
         Colis saved = colisRepository.save(colis);
 
         return colisMapper.toDTO(saved);
@@ -223,6 +249,17 @@ public class ColisService {
         if(!livreur.getId().equals(colis.getLivreur().getId())){
             throw new OperationNotAllowedException("You can't change statut for colis not assigned to you!");
         }
+
+        if(!status.equals(colis.getStatus())){
+            HistoriqueLivraison historique = new HistoriqueLivraison();
+            historique.setStatus(status);
+            historique.setComment("Colis update status par le par livreur :" + livreur.getNom() + " " + livreur.getPrenom() +" from status "+colis.getStatus() + " to status "+ status);
+            historique.setChangementDate(Instant.now());
+            historique.setColis(colis);
+
+            colis.getHistoriqueLivraisonList().add(historique);
+        }
+
         colis.setStatus(status);
 
         Colis saved = colisRepository.save(colis);
@@ -270,5 +307,10 @@ public class ColisService {
         }
 
         return livraisonStatsDTOList;
+    }
+
+    public ColisResponseDTO getColisHistorique(String id){
+        Colis colis = colisRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("aucun colis avec id: "+id));
+        return colisMapper.toDTO(colis);
     }
 }
