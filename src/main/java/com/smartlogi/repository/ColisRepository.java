@@ -1,7 +1,9 @@
 package com.smartlogi.repository;
 
+import com.smartlogi.dto.responseDTO.LivraisonStatsDTO;
 import com.smartlogi.model.Colis;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +17,15 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
             String descKeyword,
             String villeKeyword
     );
+
+    @Query("""
+        SELECT new com.smartlogi.dto.responseDTO.LivraisonStatsDTO(
+            l.nom, z.nom, COUNT(c), SUM(c.poids)
+        )
+        FROM Colis c
+        JOIN c.livreur l
+        JOIN c.city z
+        GROUP BY l.nom, z.nom
+    """)
+    List<LivraisonStatsDTO> getLivraisonStatsParLivreurEtZone();
 }

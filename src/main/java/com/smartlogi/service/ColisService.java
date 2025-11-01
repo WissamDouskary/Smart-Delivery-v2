@@ -205,7 +205,7 @@ public class ColisService {
             throw new OperationNotAllowedException("livreur est deja affecter sur ce Colis");
         }
 
-        if(livreur.getCity().equals(colis.getCity())){
+        if(!livreur.getCity().getId().equals(colis.getCity().getId())){
             throw new OperationNotAllowedException("livreur ville est different de colis ville!");
         }
 
@@ -260,5 +260,15 @@ public class ColisService {
             throw new ResourceNotFoundException("Aucun Colis pour livreur avec id: "+livreur_id);
         }
         return colisMapper.toResponseDTOList(colisList);
+    }
+
+    public List<LivraisonStatsDTO> getLivraisonStatsParLivreurEtZone(){
+        List<LivraisonStatsDTO> livraisonStatsDTOList = colisRepository.getLivraisonStatsParLivreurEtZone();
+
+        if(livraisonStatsDTOList.isEmpty()){
+            throw new ResourceNotFoundException("aucun livraison affecter a une livreur!");
+        }
+
+        return livraisonStatsDTOList;
     }
 }
