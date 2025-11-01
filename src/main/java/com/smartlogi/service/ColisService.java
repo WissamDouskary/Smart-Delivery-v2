@@ -26,17 +26,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class ColisService {
-    private ColisRepository colisRepository;
-    private CityService cityService;
-    private ColisMapper colisMapper;
-    private ReceiverService receiverService;
-    private SenderService senderService;
-    private ZoneMapper zoneMapper;
+    private final ColisRepository colisRepository;
+    private final CityService cityService;
+    private final ColisMapper colisMapper;
+    private final ReceiverService receiverService;
+    private final SenderService senderService;
+    private final ZoneMapper zoneMapper;
     private ReceiverMapper receiverMapper;
-    private SenderMapper senderMapper;
-    private LivreurService livreurService;
+    private final SenderMapper senderMapper;
+    private final LivreurService livreurService;
     private LivreurMapper livreurMapper;
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
     public ColisService(ProductRepository productRepository, LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
@@ -67,6 +67,12 @@ public class ColisService {
         Sender senderEntity = senderService.findEntityById(dto.getSender().getId());
         List<Products> products = productRepository.findAllById(dto.getProductIds());
 
+        double total_poids = 0;
+        for(Products p : products){
+            total_poids += p.getPoids();
+        }
+
+        colis.setPoids(total_poids);
         colis.setReceiver(receiverEntity);
         colis.setSender(senderEntity);
         colis.setProducts(products);

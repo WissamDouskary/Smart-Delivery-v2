@@ -17,10 +17,6 @@ public class ColisRequestDTO {
     @Size(min = 2, max = 100, message = "La description doit contenir entre 2 et 100 caractères")
     private String description;
 
-    @NotNull(message = "Le poids ne peut pas être vide")
-    @Positive(message = "Le poids doit être un nombre positif")
-    private Double poids;
-
     @NotNull(message = "Le receiver ne peut pas être vide")
     private Receiver receiver;
 
@@ -53,14 +49,6 @@ public class ColisRequestDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Double getPoids() {
-        return poids;
-    }
-
-    public void setPoids(Double poids) {
-        this.poids = poids;
     }
 
     public Receiver getReceiver() {
