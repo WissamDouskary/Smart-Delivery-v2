@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {ReceiverMapper.class, SenderMapper.class, ZoneMapper.class, ProductMapper.class, LivreurMapper.class}
+        uses = {ReceiverMapper.class, SenderMapper.class, ZoneMapper.class, ProductMapper.class, LivreurMapper.class, HistoriqueLivraisonMapper.class}
 )
 public interface ColisMapper {
     Colis toEntity(ColisRequestDTO colisRequestDTO);
