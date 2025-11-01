@@ -49,7 +49,7 @@ public class Colis {
     @JsonBackReference("zone-colis")
     private Zone city;
 
-    @OneToMany(mappedBy = "colis")
+    @OneToMany(mappedBy = "colis", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
