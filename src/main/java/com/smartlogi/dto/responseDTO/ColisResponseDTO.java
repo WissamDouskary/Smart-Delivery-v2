@@ -16,7 +16,7 @@ public class ColisResponseDTO {
     private SenderResponseDTO sender;
     private LivreurResponseDTO livreur;
     private ZoneResponseDTO city;
-    private List<HistoriqueLivraison> historiqueLivraisonList = new ArrayList<>();
+    private List<HistoriqueLivraisonResponseDTO> historiqueLivraisonList = new ArrayList<>();
     private List<ProductResponseDTO> productsList = new ArrayList<>();
     private Status status;
     private Priority priority;
@@ -93,11 +93,11 @@ public class ColisResponseDTO {
         this.city = city;
     }
 
-    public List<HistoriqueLivraison> getHistoriqueLivraisonList() {
+    public List<HistoriqueLivraisonResponseDTO> getHistoriqueLivraisonList() {
         return historiqueLivraisonList;
     }
 
-    public void setHistoriqueLivraisonList(List<HistoriqueLivraison> historiqueLivraisonList) {
+    public void setHistoriqueLivraisonList(List<HistoriqueLivraisonResponseDTO> historiqueLivraisonList) {
         this.historiqueLivraisonList = historiqueLivraisonList;
     }
 
