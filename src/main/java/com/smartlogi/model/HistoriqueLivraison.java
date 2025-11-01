@@ -1,5 +1,6 @@
 package com.smartlogi.model;
 
+import com.smartlogi.enums.Status;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -13,8 +14,9 @@ public class HistoriqueLivraison {
     @Column(name = "id", nullable = false)
     private String id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private Status status;
 
     @Column(name = "changement_date", nullable = false)
     private Instant changementDate;
@@ -22,8 +24,8 @@ public class HistoriqueLivraison {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "colis_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "colis_id")
     private Colis colis;
 
     public Colis getColis() {
@@ -50,11 +52,11 @@ public class HistoriqueLivraison {
         this.changementDate = changementDate;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
