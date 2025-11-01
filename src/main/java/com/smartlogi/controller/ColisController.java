@@ -6,6 +6,7 @@ import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
+import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -111,5 +112,11 @@ public class ColisController {
     public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colis_id){
         colisService.deleteColis(colis_id);
         return ResponseEntity.ok(new ApiResponse("Colis supprimer avec succes!", null));
+    }
+
+    @GetMapping("/{id}/historique")
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> getColisHistorique(@PathVariable String id) {
+        ColisResponseDTO response = colisService.getColisHistorique(id);
+        return ResponseEntity.ok(new ApiResponse<>("colis trouver avec success", response));
     }
 }
