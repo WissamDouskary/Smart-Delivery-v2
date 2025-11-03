@@ -337,24 +337,24 @@ public class ColisService {
             historique.setColis(colis);
 
             colis.getHistoriqueLivraisonList().add(historique);
+
+            EmailDetails emailDetails = new EmailDetails();
+
+            emailDetails.setSubject("🔄 Colis Status Updated — [Tracking ID: " + colis.getId() + "]");
+            emailDetails.setMsgBody(
+                    "<html><body style='font-family:Arial,sans-serif;color:#333;'>"
+                            + "<h2 style='color:#fbbc05;'>Colis Status Update</h2>"
+                            + "<p>Dear <b>" + colis.getSender().getNom() + " " + colis.getSender().getPrenom() + "</b>,</p>"
+                            + "<p>Your colis status has been updated by the delivery agent <b>" + livreur.getNom() + " " + livreur.getPrenom() + "</b>.</p>"
+                            + "<p><b>Updated Status:</b> " + status + "</p>"
+                            + "<p><b>Previous Status:</b> " + colis.getStatus() + "</p>"
+                            + "<p>We will notify you once the colis reaches its next milestone.</p>"
+                            + "<br><p style='color:gray;'>Thank you for trusting <b>SmartLogi</b>.</p>"
+                            + "</body></html>"
+            );
+            emailDetails.setRecipient(colis.getSender().getEmail());
+            emailService.sendMailWithHTML(emailDetails);
         }
-
-        EmailDetails emailDetails = new EmailDetails();
-
-        emailDetails.setSubject("🔄 Colis Status Updated — [Tracking ID: " + colis.getId() + "]");
-        emailDetails.setMsgBody(
-                "<html><body style='font-family:Arial,sans-serif;color:#333;'>"
-                        + "<h2 style='color:#fbbc05;'>Colis Status Update</h2>"
-                        + "<p>Dear <b>" + colis.getSender().getNom() + " " + colis.getSender().getPrenom() + "</b>,</p>"
-                        + "<p>Your colis status has been updated by the delivery agent <b>" + livreur.getNom() + " " + livreur.getPrenom() + "</b>.</p>"
-                        + "<p><b>Updated Status:</b> " + status + "</p>"
-                        + "<p><b>Previous Status:</b> " + colis.getStatus() + "</p>"
-                        + "<p>We will notify you once the colis reaches its next milestone.</p>"
-                        + "<br><p style='color:gray;'>Thank you for trusting <b>SmartLogi</b>.</p>"
-                        + "</body></html>"
-        );
-        emailDetails.setRecipient(colis.getSender().getEmail());
-        emailService.sendMailWithHTML(emailDetails);
 
         colis.setStatus(status);
 
