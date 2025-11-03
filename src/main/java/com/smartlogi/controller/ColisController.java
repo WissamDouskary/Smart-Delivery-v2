@@ -4,118 +4,120 @@ import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
-import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
-import com.smartlogi.model.Colis;
 import com.smartlogi.service.ColisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/colis")
+@Tag(name = "Colis Management", description = "Endpoints for managing colis (packages)")
 public class ColisController {
-    private ColisService colisService;
 
-    public ColisController(ColisService colisService){
+    private final ColisService colisService;
+
+    public ColisController(ColisService colisService) {
         this.colisService = colisService;
     }
 
+    @Operation(summary = "Create a new colis", description = "Add a new colis with receiver, sender, and details")
     @PostMapping
-    public ResponseEntity<ApiResponse<ColisResponseDTO>> saveColis(@Valid @RequestBody ColisRequestDTO colis){
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> saveColis(
+            @Valid @RequestBody ColisRequestDTO colis) {
         ColisResponseDTO saved = colisService.saveColis(colis);
-        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis ajouter avec succes", saved);
-        return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(new ApiResponse<>("Colis ajouté avec succès", saved));
     }
 
+    @Operation(summary = "List all colis", description = "Retrieve all colis with optional filters and pagination")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ColisResponseDTO>>> findAllColis(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String zone,
-            @RequestParam(required = false) String ville,
-            @RequestParam(required = false) String priority,
-            Pageable pageable
-    ){
+            @Parameter(description = "Status of the colis") @RequestParam(required = false) String status,
+            @Parameter(description = "Zone of the colis") @RequestParam(required = false) String zone,
+            @Parameter(description = "Ville of the colis") @RequestParam(required = false) String ville,
+            @Parameter(description = "Priority of the colis") @RequestParam(required = false) String priority,
+            Pageable pageable) {
+
         Page<ColisResponseDTO> colisResponseDTOList = colisService.findAllWithFilter(status, zone, ville, priority, pageable);
-
-        ApiResponse<Page<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
-
-        return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(new ApiResponse<>("Liste des colis récupérée avec succès", colisResponseDTOList));
     }
 
+    @Operation(summary = "Get colis summary", description = "Fetch aggregated summary of colis by status or zone")
     @GetMapping("/summary")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getSummary() {
-        return ResponseEntity.ok(new ApiResponse<>("Regroupent completer avec succes", colisService.getColisSummary()));
+        return ResponseEntity.ok(new ApiResponse<>("Résumé des colis récupéré avec succès", colisService.getColisSummary()));
     }
 
+    @Operation(summary = "Get colis for a client", description = "Retrieve all colis linked to a specific client")
     @GetMapping("/client/{id}")
-    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(@PathVariable("id") String sender_id){
-        List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForClient(sender_id);
-        ApiResponse<List<ColisResponseDTO>> listApiResponse = new ApiResponse<>("Colis Fetched avec succes", colisResponseDTOList);
-        return ResponseEntity.ok(listApiResponse);
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(
+            @PathVariable("id") String sender_id) {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du client récupérés", colisService.findAllColisForClient(sender_id)));
     }
 
+    @Operation(summary = "Get colis for a receiver", description = "Retrieve all colis sent to a specific receiver")
     @GetMapping("/receiver/{id}")
-    public ResponseEntity<ApiResponse<List<ColisSummaryDTO>>> findAllColisForReceiver(@PathVariable("id") String receiver_id){
-        List<ColisSummaryDTO> colisResponseDTOList = colisService.findAllColisForReciever(receiver_id);
-
-        ApiResponse<List<ColisSummaryDTO>> apiResponse = new ApiResponse<>("Receiver colis donner avec succes!", colisResponseDTOList);
-
-        return ResponseEntity.ok(apiResponse);
+    public ResponseEntity<ApiResponse<List<ColisSummaryDTO>>> findAllColisForReceiver(
+            @PathVariable("id") String receiver_id) {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du destinataire récupérés", colisService.findAllColisForReciever(receiver_id)));
     }
 
+    @Operation(summary = "Get colis for a livreur", description = "Retrieve all colis assigned to a specific livreur")
     @GetMapping("/livreur/{id}")
-    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColisByLivreur_Id(@PathVariable("id") String livreur_id){
-        List<ColisResponseDTO> colisResponseDTOList = colisService.findAllColisForLivreurs(livreur_id);
-
-        ApiResponse<List<ColisResponseDTO>> apiResponse = new ApiResponse<>("colis recu avec succes!", colisResponseDTOList);
-
-        return ResponseEntity.ok(apiResponse);
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColisByLivreur_Id(
+            @PathVariable("id") String livreur_id) {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du livreur récupérés", colisService.findAllColisForLivreurs(livreur_id)));
     }
 
+    @Operation(summary = "Update colis status", description = "Change the status of a colis assigned to a livreur")
     @PatchMapping("{colis_id}/livreur/{livreur_id}")
-    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColisByLivreur(@PathVariable("colis_id") String colis_id, @PathVariable("livreur_id") String livreur_id, @RequestBody Status status){
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColisByLivreur(
+            @PathVariable("colis_id") String colis_id,
+            @PathVariable("livreur_id") String livreur_id,
+            @RequestBody Status status) {
+
         ColisResponseDTO colisResponseDTO = colisService.updateColisByLivreur(livreur_id, status, colis_id);
-
-        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis modifier avec succes!", colisResponseDTO);
-
-        return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(new ApiResponse<>("Statut du colis mis à jour", colisResponseDTO));
     }
 
+    @Operation(summary = "Assign colis to a livreur", description = "Link a colis to a livreur for delivery")
     @PatchMapping("/affect/{colis_id}/livreur/{livreur_id}")
-    public ResponseEntity<ApiResponse<ColisResponseDTO>> affectColisToLivreur(@PathVariable("colis_id") String colis_id, @PathVariable("livreur_id") String livreur_id){
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> affectColisToLivreur(
+            @PathVariable("colis_id") String colis_id,
+            @PathVariable("livreur_id") String livreur_id) {
+
         ColisResponseDTO colisResponseDTO = colisService.affectColisToLivreur(livreur_id, colis_id);
-
-        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis affected to livreur ", colisResponseDTO);
-
-        return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(new ApiResponse<>("Colis affecté au livreur avec succès", colisResponseDTO));
     }
 
+    @Operation(summary = "Update a colis", description = "Update details of an existing colis")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColis(@PathVariable("id") String colis_id, @RequestBody ColisResponseDTO colis){
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColis(
+            @PathVariable("id") String colis_id,
+            @RequestBody ColisResponseDTO colis) {
         ColisResponseDTO colisResponseDTO = colisService.updateColis(colis, colis_id);
-
-        ApiResponse<ColisResponseDTO> apiResponse = new ApiResponse<>("Colis modifier avec succes", colisResponseDTO);
-
-        return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(new ApiResponse<>("Colis mis à jour", colisResponseDTO));
     }
 
+    @Operation(summary = "Delete a colis", description = "Remove a colis from the system by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colis_id){
+    public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colis_id) {
         colisService.deleteColis(colis_id);
-        return ResponseEntity.ok(new ApiResponse("Colis supprimer avec succes!", null));
+        return ResponseEntity.ok(new ApiResponse<>("Colis supprimé avec succès", null));
     }
 
+    @Operation(summary = "Get colis history", description = "Retrieve the full history of a colis by ID")
     @GetMapping("/{id}/historique")
     public ResponseEntity<ApiResponse<ColisResponseDTO>> getColisHistorique(@PathVariable String id) {
         ColisResponseDTO response = colisService.getColisHistorique(id);
-        return ResponseEntity.ok(new ApiResponse<>("colis trouver avec success", response));
+        return ResponseEntity.ok(new ApiResponse<>("Historique du colis récupéré", response));
     }
 }
