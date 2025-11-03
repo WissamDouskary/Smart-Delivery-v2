@@ -37,14 +37,13 @@ public class ColisController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ColisResponseDTO>>> findAllColis(
-            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String zone,
             @RequestParam(required = false) String ville,
-            @RequestParam(required = false) Priority priority,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String priority,
             Pageable pageable
     ){
-        Page<ColisResponseDTO> colisResponseDTOList = colisService.findAllWithFilter(status, zone, ville, priority, date, pageable);
+        Page<ColisResponseDTO> colisResponseDTOList = colisService.findAllWithFilter(status, zone, ville, priority, pageable);
 
         ApiResponse<Page<ColisResponseDTO>> apiResponse = new ApiResponse<>("Tout les colis: ", colisResponseDTOList);
 

@@ -189,19 +189,40 @@ public class ColisService {
     }
 
     public Page<ColisResponseDTO> findAllWithFilter(
-            Status status,
+            String status,
             String zone,
             String ville,
-            Priority priority,
-            LocalDate date,
+            String priority,
             Pageable pageable
     ){
+        Status enumStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                enumStatus = Status.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new ResourceNotFoundException("Invalid status: " + status);
+            }
+        }
+
+        Priority enumPriority = null;
+        if(priority != null && !priority.isEmpty()){
+            try{
+                enumPriority = Priority.valueOf(priority.toUpperCase());
+            }
+            catch (IllegalArgumentException e){
+                throw new ResourceNotFoundException("Invalid priority: "+priority);
+            }
+        }
+
         Page<Colis> page = colisRepository.findAll(pageable);
+
+        Status finalEnumStatus = enumStatus;
+        Priority finalEnumPriority = enumPriority;
 
         List<ColisResponseDTO> filtered = page.getContent()
                 .stream()
-                .filter(c -> status == null || c.getStatus() == status)
-                .filter(c -> priority == null || c.getPriority() == priority)
+                .filter(c -> finalEnumStatus == null || c.getStatus() == finalEnumStatus)
+                .filter(c -> finalEnumPriority == null || c.getPriority() == finalEnumPriority)
                 .filter(c -> ville == null || c.getVileDistination().equalsIgnoreCase(ville))
                 .filter(c -> zone == null || (c.getCity() != null && c.getCity().getNom().equalsIgnoreCase(zone)))
                 .map(colisMapper::toDTO)
