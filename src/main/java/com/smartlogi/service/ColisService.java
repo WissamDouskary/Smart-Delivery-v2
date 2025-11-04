@@ -119,57 +119,35 @@ public class ColisService {
         return colisMapper.toDTO(saved);
     }
 
-    public ColisResponseDTO updateColis(ColisResponseDTO dto, String colis_id) {
+    public ColisResponseDTO updateColis(ColisUpdateDTO dto, String colis_id) {
         Colis colis = colisRepository.findById(colis_id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
 
-        Livreur livreurEntity = null;
-        if (dto.getLivreur() != null && dto.getLivreur().getId() != null) {
-            livreurEntity = livreurService.findEntityById(dto.getLivreur().getId());
-        } else {
-            livreurEntity = colis.getLivreur();
+        if(dto.getReceiverId() != null){
+            Receiver receiver = receiverService.findEntityById(dto.getReceiverId());
+            colis.setReceiver(receiver);
         }
 
-        Sender senderEntity = null;
-        if (dto.getSender() != null && dto.getSender().getId() != null) {
-            senderEntity = senderService.findEntityById(dto.getSender().getId());
-        } else {
-            senderEntity = colis.getSender();
+        if(dto.getSenderId() != null){
+            Sender sender = senderService.findEntityById(dto.getSenderId());
+            colis.setSender(sender);
         }
 
-        Receiver receiverEntity = null;
-        if (dto.getReceiver() != null && dto.getReceiver().getId() != null) {
-            receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
-        } else {
-            receiverEntity = colis.getReceiver();
+        if(dto.getLivreurId() != null){
+            Livreur livreur = livreurService.findEntityById(dto.getLivreurId());
+            colis.setLivreur(livreur);
         }
 
-        Zone zone = null;
-        if (dto.getCity() != null && dto.getCity().getId() != null) {
-            ZoneResponseDTO zoneResponseDTO = cityService.findCityById(dto.getCity().getId());
-            zone = zoneMapper.toEntity(zoneResponseDTO);
-            if (dto.getVileDistination() != null && !dto.getVileDistination().equals(zone.getNom())) {
-                throw new AccessDeniedException("La ville destinataire doit être la même que celle du city id.");
+        if(dto.getCityId() != null){
+            ZoneResponseDTO zone = cityService.findCityById(dto.getCityId());
+            if(!zone.getNom().equals(colis.getCity().getNom())){
+                throw new OperationNotAllowedException("tu ne peut pas lieé ce colis avec une zone different");
             }
-        } else {
-            zone = colis.getCity();
+            Zone zoneEntity = zoneMapper.toEntity(zone);
+            colis.setCity(zoneEntity);
         }
 
-        if (dto.getDescription() == null) dto.setDescription(colis.getDescription());
-        if (dto.getPoids() == null || dto.getPoids() == 0) dto.setPoids(colis.getPoids());
-        if (dto.getVileDistination() == null) dto.setVileDistination(zone.getNom());
-        if (dto.getStatus() == null) dto.setStatus(colis.getStatus());
-        if (dto.getPriority() == null) dto.setPriority(colis.getPriority());
-
-        colis.setDescription(dto.getDescription());
-        colis.setPoids(dto.getPoids());
-        colis.setVileDistination(zone.getNom());
-        colis.setStatus(dto.getStatus());
-        colis.setPriority(dto.getPriority());
-        colis.setSender(senderEntity);
-        colis.setReceiver(receiverEntity);
-        colis.setLivreur(livreurEntity);
-        colis.setCity(zone);
+        colisMapper.updateColisFromDto(dto, colis);
 
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setStatus(colis.getStatus());
