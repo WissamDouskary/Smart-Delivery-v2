@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; color: #333; background-color: #f8f9fa; padding: 20px;">
+<div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); padding: 30px;">
+    <h2 style="color:#34a853; text-align:center;">🚚 Colis Assigned to Livreur</h2>
+    <p>Dear <b th:text="${senderName}">Sender Name</b>,</p>
+    <p>Your colis has been successfully assigned to a delivery agent for shipment.</p>
+
+    <h3>📦 Colis Details</h3>
+    <ul>
+        <li><b>Tracking ID:</b> <span th:text="${colisId}"></span></li>
+        <li><b>Destination:</b> <span th:text="${destination}"></span></li>
+        <li><b>Receiver:</b> <span th:text="${receiverName}"></span></li>
+        <li><b>Status:</b> <span th:text="${status}"></span></li>
+    </ul>
+
+    <h3>👤 Livreur Details</h3>
+    <ul>
+        <li><b>Name:</b> <span th:text="${livreurName}"></span></li>
+        <li><b>City:</b> <span th:text="${livreurCity}"></span></li>
+        <li><b>Contact:</b> <span th:text="${livreurPhone}"></span></li>
+    </ul>
+
+    <p>The delivery process will begin shortly. You’ll receive updates on each step of your colis delivery.</p>
+
+    <div style="text-align:center; margin-top:30px; color:gray;">
+        <p>Thank you for choosing <b>SmartLogi</b>.<br>We value your trust.</p>
+    </div>
+</div>
+</body>
+</html>

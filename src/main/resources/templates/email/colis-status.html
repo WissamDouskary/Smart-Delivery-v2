@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; color: #333; background-color: #f9fafb; padding: 20px;">
+<div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); padding: 30px;">
+    <h2 style="color:#fbbc05; text-align:center;">🔄 Colis Status Update</h2>
+    <p>Dear <b th:text="${senderName}">Sender Name</b>,</p>
+    <p>Your colis status has been updated by <b th:text="${livreurName}">Livreur</b>.</p>
+
+    <h3>📦 Update Details</h3>
+    <ul>
+        <li><b>Tracking ID:</b> <span th:text="${colisId}"></span></li>
+        <li><b>Previous Status:</b> <span th:text="${oldStatus}"></span></li>
+        <li><b>Updated Status:</b> <span th:text="${newStatus}"></span></li>
+    </ul>
+
+    <p>We will notify you once your colis reaches its next milestone.</p>
+
+    <div style="text-align:center; margin-top:30px; color:gray;">
+        <p>Thank you for trusting <b>SmartLogi</b>.<br>Your satisfaction drives us forward.</p>
+    </div>
+</div>
+</body>
+</html>
