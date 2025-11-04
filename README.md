@@ -43,7 +43,7 @@ SmartLogi is a comprehensive logistics management system API that handles packag
 - **API Documentation**: Swagger/OpenAPI 3
 - **Validation**: Jakarta Validation
 - **Email**: Spring Mail (JavaMailSender)
-- **Database**: JPA/Hibernate
+- **Database**: Entity: Liquibase / ORM Management: JPA/Hibernate
 - **Pagination**: Spring Data
 
 ## Architecture
