@@ -1,62 +1,102 @@
 package com.smartlogi.mail.service;
 
-// Importing required classes
-import java.io.File;
-
-import com.smartlogi.mail.EmailDetails;
+import com.smartlogi.enums.Status;
+import com.smartlogi.model.Colis;
+import com.smartlogi.model.Livreur;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
-    @Value("${spring.mail.username}") private String sender;
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
 
-    public String sendMail(EmailDetails details)
-    {
+    public String sendColisCreatedEmail(Colis colis) {
         try {
-            SimpleMailMessage mailMessage
-                    = new SimpleMailMessage();
+            Context ctx = new Context();
+            ctx.setVariable("senderName", colis.getSender().getNom() + " " + colis.getSender().getPrenom());
+            ctx.setVariable("creationDate", LocalDate.now());
+            ctx.setVariable("colisId", colis.getId());
+            ctx.setVariable("status", colis.getStatus().toString());
+            ctx.setVariable("destination", colis.getVileDistination());
+            ctx.setVariable("receiverName", colis.getReceiver().getNom() + " " + colis.getReceiver().getPrenom());
+            ctx.setVariable("weight", colis.getPoids());
 
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipient());
-            mailMessage.setText(details.getMsgBody());
-            mailMessage.setSubject(details.getSubject());
+            String htmlBody = templateEngine.process("email/colis-created", ctx);
 
-            javaMailSender.send(mailMessage);
-            return "Mail Sent Successfully...";
-        }
-
-        catch (Exception e) {
-            return "Error while Sending Mail";
+            return sendHtmlMail(colis.getSender().getEmail(),
+                    "📦 Your Colis Has Been Successfully Created — [Tracking ID: " + colis.getId() + "]",
+                    htmlBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while sending creation email.";
         }
     }
 
-    public String sendMailWithHTML(EmailDetails details) {
+    public String sendColisAssignedEmail(Colis colis, Livreur livreur) {
         try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            Context ctx = new Context();
+            ctx.setVariable("senderName", colis.getSender().getNom() + " " + colis.getSender().getPrenom());
+            ctx.setVariable("colisId", colis.getId());
+            ctx.setVariable("destination", colis.getVileDistination());
+            ctx.setVariable("receiverName", colis.getReceiver().getNom() + " " + colis.getReceiver().getPrenom());
+            ctx.setVariable("status", colis.getStatus().toString());
+            ctx.setVariable("livreurName", livreur.getNom() + " " + livreur.getPrenom());
+            ctx.setVariable("livreurCity", livreur.getCity().getNom());
+            ctx.setVariable("livreurPhone", livreur.getTelephone());
 
-            helper.setFrom(sender);
-            helper.setTo(details.getRecipient());
-            helper.setSubject(details.getSubject());
-            helper.setText(details.getMsgBody(), true);
+            String htmlBody = templateEngine.process("email/colis-assigned", ctx);
 
-            javaMailSender.send(message);
-            return "HTML Mail Sent Successfully...";
-        } catch (MessagingException e) {
+            return sendHtmlMail(colis.getSender().getEmail(),
+                    "🚚 Your Colis Has Been Assigned to a Livreur — [Tracking ID: " + colis.getId() + "]",
+                    htmlBody);
+        } catch (Exception e) {
             e.printStackTrace();
-            return "Error while Sending HTML Mail";
+            return "Error while sending assignment email.";
         }
+    }
+
+    public String sendColisStatusUpdatedEmail(Colis colis, Livreur livreur, Status oldStatus, Status newStatus) {
+        try {
+            Context ctx = new Context();
+            ctx.setVariable("senderName", colis.getSender().getNom() + " " + colis.getSender().getPrenom());
+            ctx.setVariable("colisId", colis.getId());
+            ctx.setVariable("livreurName", livreur.getNom() + " " + livreur.getPrenom());
+            ctx.setVariable("oldStatus", oldStatus);
+            ctx.setVariable("newStatus", newStatus);
+
+            String htmlBody = templateEngine.process("email/colis-status", ctx);
+
+            return sendHtmlMail(colis.getSender().getEmail(),
+                    "🔄 Colis Status Updated — [Tracking ID: " + colis.getId() + "]",
+                    htmlBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while sending status update email.";
+        }
+    }
+
+    private String sendHtmlMail(String recipient, String subject, String htmlBody) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setFrom("smartlogi.noreply@gmail.com");
+        helper.setTo(recipient);
+        helper.setSubject(subject);
+        helper.setText(htmlBody, true);
+
+        mailSender.send(message);
+        return "Email sent successfully.";
     }
 }

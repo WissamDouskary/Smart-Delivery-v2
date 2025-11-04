@@ -1,11 +1,9 @@
 package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
 import com.smartlogi.dto.responseDTO.*;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
-import com.smartlogi.exception.AccessDeniedException;
 import com.smartlogi.exception.OperationNotAllowedException;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mail.EmailDetails;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,28 +90,7 @@ public class ColisService {
 
         Colis saved = colisRepository.save(colis);
 
-        EmailDetails emailDetails = new EmailDetails();
-
-        emailDetails.setSubject("📦 Your Colis Has Been Successfully Created — [Tracking ID: " + colis.getId() + "]");
-        emailDetails.setMsgBody(
-                "<html><body style='font-family:Arial,sans-serif;color:#333;'>"
-                        + "<h2 style='color:#2c7be5;'>Colis Created Successfully!</h2>"
-                        + "<p>Dear <b>" + senderEntity.getNom() + " " + senderEntity.getPrenom() + "</b>,</p>"
-                        + "<p>Your colis has been successfully created on <b>" + LocalDate.now() + "</b>.</p>"
-                        + "<p><b>Colis Details:</b></p>"
-                        + "<ul>"
-                        + "<li><b>Tracking ID:</b> " + colis.getId() + "</li>"
-                        + "<li><b>Status:</b> " + colis.getStatus() + "</li>"
-                        + "<li><b>Destination:</b> " + colis.getVileDistination() + "</li>"
-                        + "<li><b>Receiver:</b> " + receiverEntity.getNom() + " " + receiverEntity.getPrenom() + "</li>"
-                        + "<li><b>Total Weight:</b> " + colis.getPoids() + " kg</li>"
-                        + "</ul>"
-                        + "<p>You can track your colis status anytime in your SmartLogi dashboard.</p>"
-                        + "<br><p style='color:gray;'>Thank you for trusting <b>SmartLogi</b>!</p>"
-                        + "</body></html>"
-        );
-        emailDetails.setRecipient(colis.getSender().getEmail());
-        emailService.sendMailWithHTML(emailDetails);
+        emailService.sendColisCreatedEmail(colis);
 
         return colisMapper.toDTO(saved);
     }
@@ -265,36 +241,7 @@ public class ColisService {
 
         Colis saved = colisRepository.save(colis);
 
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setRecipient(colis.getSender().getEmail());
-        emailDetails.setSubject("🚚 Your Colis Has Been Assigned to a Delivery Agent — [Tracking ID: " + colis.getId() + "]");
-
-        String htmlBody =
-                "<html><body style='font-family: Arial, sans-serif; color: #333; background-color: #f8f9fa; padding: 20px;'>"
-                        + "<div style='max-width: 600px; margin: auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 25px;'>"
-                        + "<h2 style='color:#34a853; text-align:center;'>🚚 Colis Assigned to Livreur</h2>"
-                        + "<p>Dear <b>" + colis.getSender().getNom() + " " + colis.getSender().getPrenom() + "</b>,</p>"
-                        + "<p>We are pleased to inform you that your colis has been assigned to a delivery agent for shipment.</p>"
-                        + "<h3 style='color:#333;'>📦 Colis Details</h3>"
-                        + "<ul>"
-                        + "<li><b>Tracking ID:</b> " + colis.getId() + "</li>"
-                        + "<li><b>Destination:</b> " + colis.getVileDistination() + "</li>"
-                        + "<li><b>Receiver:</b> " + colis.getReceiver().getNom() + " " + colis.getReceiver().getPrenom() + "</li>"
-                        + "<li><b>Status:</b> " + colis.getStatus() + "</li>"
-                        + "</ul>"
-                        + "<h3 style='color:#333;'>👤 Livreur Details</h3>"
-                        + "<ul>"
-                        + "<li><b>Name:</b> " + livreur.getNom() + " " + livreur.getPrenom() + "</li>"
-                        + "<li><b>City:</b> " + livreur.getCity().getNom() + "</li>"
-                        + "<li><b>Contact:</b> " + livreur.getTelephone() + "</li>"
-                        + "</ul>"
-                        + "<p>The delivery process will begin shortly. You’ll receive updates on each step of your colis delivery.</p>"
-                        + "<br><p style='color:gray; text-align:center;'>Thank you for choosing <b>SmartLogi</b>.<br>We value your trust.</p>"
-                        + "</div></body></html>";
-
-        emailDetails.setMsgBody(htmlBody);
-
-        emailService.sendMailWithHTML(emailDetails);
+        emailService.sendColisAssignedEmail(colis, livreur);
 
         return colisMapper.toDTO(saved);
     }
@@ -316,22 +263,7 @@ public class ColisService {
 
             colis.getHistoriqueLivraisonList().add(historique);
 
-            EmailDetails emailDetails = new EmailDetails();
-
-            emailDetails.setSubject("🔄 Colis Status Updated — [Tracking ID: " + colis.getId() + "]");
-            emailDetails.setMsgBody(
-                    "<html><body style='font-family:Arial,sans-serif;color:#333;'>"
-                            + "<h2 style='color:#fbbc05;'>Colis Status Update</h2>"
-                            + "<p>Dear <b>" + colis.getSender().getNom() + " " + colis.getSender().getPrenom() + "</b>,</p>"
-                            + "<p>Your colis status has been updated by the delivery agent <b>" + livreur.getNom() + " " + livreur.getPrenom() + "</b>.</p>"
-                            + "<p><b>Updated Status:</b> " + status + "</p>"
-                            + "<p><b>Previous Status:</b> " + colis.getStatus() + "</p>"
-                            + "<p>We will notify you once the colis reaches its next milestone.</p>"
-                            + "<br><p style='color:gray;'>Thank you for trusting <b>SmartLogi</b>.</p>"
-                            + "</body></html>"
-            );
-            emailDetails.setRecipient(colis.getSender().getEmail());
-            emailService.sendMailWithHTML(emailDetails);
+            emailService.sendColisStatusUpdatedEmail(colis, livreur, colis.getStatus(), status);
         }
 
         colis.setStatus(status);
