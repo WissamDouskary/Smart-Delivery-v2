@@ -2,6 +2,7 @@ package com.smartlogi.controller;
 
 import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
+import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
 import com.smartlogi.enums.Status;
@@ -102,9 +103,9 @@ public class ColisController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ColisResponseDTO>> updateColis(
             @PathVariable("id") String colis_id,
-            @RequestBody ColisResponseDTO colis) {
+            @Valid @RequestBody ColisUpdateDTO colis) {
         ColisResponseDTO colisResponseDTO = colisService.updateColis(colis, colis_id);
-        return ResponseEntity.ok(new ApiResponse<>("Colis mis à jour", colisResponseDTO));
+        return ResponseEntity.ok(new ApiResponse<>("Colis mise à jour", colisResponseDTO));
     }
 
     @Operation(summary = "Delete a colis", description = "Remove a colis from the system by ID")
