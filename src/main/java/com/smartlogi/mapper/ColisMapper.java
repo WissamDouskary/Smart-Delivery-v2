@@ -2,10 +2,10 @@ package com.smartlogi.mapper;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
+import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.model.Colis;
 import com.smartlogi.model.Livreur;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -19,4 +19,8 @@ public interface ColisMapper {
     @Mapping(target = "productsList", source = "products")
     ColisResponseDTO toDTO(Colis colis);
     List<ColisResponseDTO> toResponseDTOList(List<Colis> colisList);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateColisFromDto(ColisUpdateDTO dto, @MappingTarget Colis colis);
+
 }
