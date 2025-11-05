@@ -257,11 +257,15 @@ public class ColisService {
         Colis colis = colisRepository.findById(colis_id).orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: "+colis_id));
         Livreur livreur = livreurService.findEntityById(livreur_id);
 
+        if(colis.getStatus() == Status.IN_STOCK && !livreur.getCity().getNom().equals("Maroc")){
+            throw new OperationNotAllowedException("Colis est en stock, le livreur doit étre avec zone nom 'Maroc'!");
+        }
+
         if(colis.getLivreur() != null && livreur.getId().equals(colis.getLivreur().getId())){
             throw new OperationNotAllowedException("livreur est deja affecter sur ce Colis");
         }
 
-        if(!livreur.getCity().getId().equals(colis.getCity().getId())){
+        if(!livreur.getCity().getId().equals(colis.getCity().getId()) && colis.getStatus() != Status.IN_STOCK){
             throw new OperationNotAllowedException("livreur ville est different de colis ville!");
         }
 
@@ -303,6 +307,10 @@ public class ColisService {
         }
 
         colis.setStatus(status);
+
+        if(colis.getStatus() == Status.IN_STOCK);{
+            colis.setLivreur(null);
+        }
 
         Colis saved = colisRepository.save(colis);
 
