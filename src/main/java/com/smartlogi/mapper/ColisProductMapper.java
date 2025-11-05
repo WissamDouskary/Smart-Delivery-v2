@@ -1,5 +1,6 @@
-package com.smartlogi.dto.responseDTO;
+package com.smartlogi.mapper;
 
+import com.smartlogi.dto.responseDTO.ColisProductResponseDTO;
 import com.smartlogi.model.ColisProduct;
 import org.mapstruct.*;
 

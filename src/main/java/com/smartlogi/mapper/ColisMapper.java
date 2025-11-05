@@ -1,15 +1,12 @@
 package com.smartlogi.mapper;
 
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.dto.responseDTO.ColisProductMapper;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.model.Colis;
-import com.smartlogi.model.Livreur;
 import org.mapstruct.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(
         componentModel = "spring",
