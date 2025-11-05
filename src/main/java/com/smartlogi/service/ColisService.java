@@ -325,7 +325,7 @@ public class ColisService {
 
         List<ColisSummaryDTO> colisResponseDTOList = colisList.stream().map(c -> {
             ColisSummaryDTO dto = new ColisSummaryDTO();
-            dto.setSender(senderMapper.toResponseDTO(c.getSender()));
+            dto.setSender(senderMapper.toDTO(c.getSender()));
             dto.setStatus(c.getStatus());
             return dto;
         }).toList();

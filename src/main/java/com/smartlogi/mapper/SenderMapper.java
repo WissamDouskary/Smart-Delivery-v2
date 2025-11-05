@@ -10,6 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SenderMapper {
     Sender toEntity(SenderRequestDTO dto);
-    SenderResponseDTO toResponseDTO(Sender sender);
+    SenderResponseDTO toDTO(Sender sender);
     List<SenderResponseDTO> toResponseDTOList(List<Sender> senders);
 }

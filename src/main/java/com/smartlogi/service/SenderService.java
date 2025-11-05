@@ -27,12 +27,12 @@ public class SenderService {
     public SenderResponseDTO saveSender(SenderRequestDTO dto){
         Sender s = senderMapper.toEntity(dto);
         Sender savedSender = senderRepository.save(s);
-        return senderMapper.toResponseDTO(savedSender);
+        return senderMapper.toDTO(savedSender);
     }
 
     public SenderResponseDTO findById(String id){
         Sender senderResponse = senderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Aucun sender avec id: "+id));
-        return senderMapper.toResponseDTO(senderResponse);
+        return senderMapper.toDTO(senderResponse);
     }
 
     public Sender findEntityById(String id) {

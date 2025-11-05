@@ -17,16 +17,16 @@ public class ColisResponseDTO {
     private LivreurResponseDTO livreur;
     private ZoneResponseDTO city;
     private List<HistoriqueLivraisonResponseDTO> historiqueLivraisonList = new ArrayList<>();
-    private List<ProductResponseDTO> productsList = new ArrayList<>();
+    private List<ColisProductResponseDTO> colisProducts = new ArrayList<>();
     private Status status;
     private Priority priority;
 
-    public List<ProductResponseDTO> getProductsList() {
-        return productsList;
+    public List<ColisProductResponseDTO> getColisProducts() {
+        return colisProducts;
     }
 
-    public void setProductsList(List<ProductResponseDTO> productsList) {
-        this.productsList = productsList;
+    public void setColisProducts(List<ColisProductResponseDTO> colisProducts) {
+        this.colisProducts = colisProducts;
     }
 
     public String getId() {

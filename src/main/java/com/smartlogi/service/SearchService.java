@@ -53,7 +53,7 @@ public class SearchService {
         List<SenderResponseDTO> senderList = senderRepository
                 .findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword, keyword)
                 .stream()
-                .map(senderMapper::toResponseDTO)
+                .map(senderMapper::toDTO)
                 .toList();
 
         List<ReceiverResponseDTO> receiverList = receiverRepository

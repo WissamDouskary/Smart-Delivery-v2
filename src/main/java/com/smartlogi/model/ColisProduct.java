@@ -15,12 +15,12 @@ public class ColisProduct {
     private ColisProductId id;
 
     @MapsId("colisId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "colis_id", nullable = false)
     private Colis colis;
 
     @MapsId("productId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Products product;
 
