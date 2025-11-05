@@ -9,6 +9,8 @@ import com.smartlogi.repository.ReceiverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ReceiverService {
     private ReceiverRepository receiverRepository;
@@ -34,5 +36,13 @@ public class ReceiverService {
     public Receiver findEntityById(String id) {
         return receiverRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Receiver not found"));
+    }
+
+    public List<ReceiverResponseDTO> findAll(){
+        List<Receiver> receivers = receiverRepository.findAll();
+        if(receivers.isEmpty()){
+            throw new ResourceNotFoundException("aucun receiver!");
+        }
+        return receiverMapper.toResponseDTOList(receivers);
     }
 }

@@ -2,6 +2,7 @@ package com.smartlogi.controller;
 
 import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.SenderRequestDTO;
+import com.smartlogi.dto.responseDTO.ProductResponseDTO;
 import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.service.SenderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/sender")
@@ -38,5 +41,11 @@ public class SenderController {
 
         ApiResponse<SenderResponseDTO> apiResponse = new ApiResponse<>("Sender Trouvé!", senderResponseDTO);
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @Operation(summary = "Get All Senders")
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<SenderResponseDTO>>> findAll(){
+        return ResponseEntity.ok(new ApiResponse<>("Sender donner avec success", senderService.findAll()));
     }
 }

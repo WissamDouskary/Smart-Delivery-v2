@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/colis")
+@CrossOrigin("*")
 @Tag(name = "Colis Management", description = "Endpoints for managing colis (packages)")
 public class ColisController {
 
@@ -36,6 +37,12 @@ public class ColisController {
             @Valid @RequestBody ColisRequestDTO colis) {
         ColisResponseDTO saved = colisService.saveColis(colis);
         return ResponseEntity.ok(new ApiResponse<>("Colis ajouté avec succès", saved));
+    }
+
+    @Operation(summary = "get colis by id")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ColisResponseDTO>> findColisById(@PathVariable("id") String id){
+        return ResponseEntity.ok(new ApiResponse<>("Colis donner avec success", colisService.findColisById(id)));
     }
 
     @Operation(summary = "List all colis", description = "Retrieve all colis with optional filters and pagination")

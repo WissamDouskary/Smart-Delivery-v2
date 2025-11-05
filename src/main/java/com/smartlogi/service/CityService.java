@@ -1,12 +1,15 @@
 package com.smartlogi.service;
 
+import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ZoneMapper;
+import com.smartlogi.model.Sender;
 import com.smartlogi.model.Zone;
 import com.smartlogi.repository.CityRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,5 +25,13 @@ public class CityService {
     public ZoneResponseDTO findCityById(String id){
         Zone ZoneResponseDTO = cityRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Aucun City avec ce id: "+id));
         return zoneMapper.toDAO(ZoneResponseDTO);
+    }
+
+    public List<ZoneResponseDTO> findAll(){
+        List<Zone> zones = cityRepository.findAll();
+        if(zones.isEmpty()){
+            throw new ResourceNotFoundException("aucun zones!");
+        }
+        return zoneMapper.toListDTO(zones);
     }
 }

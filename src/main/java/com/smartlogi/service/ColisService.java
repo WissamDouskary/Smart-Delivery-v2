@@ -95,6 +95,12 @@ public class ColisService {
         return colisMapper.toDTO(saved);
     }
 
+    public ColisResponseDTO findColisById(String colis_id){
+        Colis colis = colisRepository.findById(colis_id)
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
+        return colisMapper.toDTO(colis);
+    }
+
     public ColisResponseDTO updateColis(ColisUpdateDTO dto, String colis_id) {
         Colis colis = colisRepository.findById(colis_id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
@@ -319,4 +325,6 @@ public class ColisService {
         Colis colis = colisRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("aucun colis avec id: "+id));
         return colisMapper.toDTO(colis);
     }
+
+
 }
