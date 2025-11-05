@@ -27,15 +27,15 @@ public class Products {
     @Column(name = "price", nullable = false)
     private Double price;
 
-    @ManyToMany(mappedBy = "products")
-    private List<Colis> colisList = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ColisProduct> colisProducts = new ArrayList<>();
 
-    public List<Colis> getColisProducts() {
-        return colisList;
+    public List<ColisProduct> getColisProducts() {
+        return colisProducts;
     }
 
-    public void setColisProducts(List<Colis> colisProducts) {
-        this.colisList = colisProducts;
+    public void setColisProducts(List<ColisProduct> colisProducts) {
+        this.colisProducts = colisProducts;
     }
 
     public Double getPrice() {

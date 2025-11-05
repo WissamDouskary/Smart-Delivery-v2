@@ -17,6 +17,10 @@ public class ColisRequestDTO {
     @Size(min = 2, max = 100, message = "La description doit contenir entre 2 et 100 caractères")
     private String description;
 
+    @NotBlank(message = "La ville Distination ne peut pas être vide")
+    @Size(min = 2, max = 100, message = "La ville Distination doit contenir entre 2 et 100 caractères")
+    private String vileDistination;
+
     @NotNull(message = "Le receiver ne peut pas être vide")
     private Receiver receiver;
 
@@ -24,23 +28,20 @@ public class ColisRequestDTO {
     private Sender sender;
 
     @NotNull(message = "Le Produit ne peut pas être vide")
-    private List<String> productIds;
+    private List<ColisProductsRequestDTO> products;
 
     @NotNull(message = "La city ne peut pas être vide")
     private Zone city;
 
-    @NotNull(message = "Le Status ne peut pas être vide")
-    private Status status;
-
     @NotNull(message = "La priority ne peut pas être vide")
     private Priority priority;
 
-    public List<String> getProductIds() {
-        return productIds;
+    public List<ColisProductsRequestDTO> getProducts() {
+        return products;
     }
 
-    public void setProductIds(List<String> productIds) {
-        this.productIds = productIds;
+    public void setProducts(List<ColisProductsRequestDTO> products) {
+        this.products = products;
     }
 
     public String getDescription() {
@@ -75,19 +76,19 @@ public class ColisRequestDTO {
         this.city = city;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public Priority getPriority() {
         return priority;
     }
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public String getVileDistination() {
+        return vileDistination;
+    }
+
+    public void setVileDistination(String vileDistination) {
+        this.vileDistination = vileDistination;
     }
 }

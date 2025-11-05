@@ -60,14 +60,8 @@ public class Colis {
     @Column(nullable = false)
     private Priority priority;
 
-    @ManyToMany
-    @JoinTable(
-            name = "colis_products",
-            joinColumns = @JoinColumn(name = "colis_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-
-    private List<Products> products;
+    @OneToMany(mappedBy = "colis", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ColisProduct> colisProducts = new ArrayList<>();
 
     public Zone getCity() {
         return city;
@@ -101,12 +95,12 @@ public class Colis {
         this.priority = priority;
     }
 
-    public List<Products> getProducts() {
-        return products;
+    public List<ColisProduct> getColisProducts() {
+        return colisProducts;
     }
 
-    public void setProducts(List<Products> products) {
-        this.products = products;
+    public void setColisProducts(List<ColisProduct> colisProducts) {
+        this.colisProducts = colisProducts;
     }
 
     public Livreur getLivreur() {

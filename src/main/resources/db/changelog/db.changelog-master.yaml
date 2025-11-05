@@ -29,3 +29,5 @@ databaseChangeLog:
       file: db/changelog/015-change-property-status-type.yaml
   - include:
       file: db/changelog/016-change-changementDate-name.yaml
+  - include:
+      file: db/changelog/017-add-price-quantity-to-colis_products.yaml

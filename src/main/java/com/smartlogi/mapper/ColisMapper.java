@@ -16,7 +16,6 @@ import java.util.List;
 public interface ColisMapper {
     Colis toEntity(ColisRequestDTO colisRequestDTO);
 
-    @Mapping(target = "productsList", source = "products")
     ColisResponseDTO toDTO(Colis colis);
     List<ColisResponseDTO> toResponseDTOList(List<Colis> colisList);
 

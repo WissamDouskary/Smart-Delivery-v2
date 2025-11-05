@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 17
+      author: wissam
+      changes:
+        - addColumn:
+            tableName: colis_products
+            columns:
+              - column:
+                  name: prix
+                  type: double
+              - column:
+                  name: quantity
+                  type: integer
+              - column:
+                  name: date_ajout
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
