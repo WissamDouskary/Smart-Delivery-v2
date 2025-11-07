@@ -130,19 +130,31 @@ POST /api/colis
 **Request Body:**
 ```json
 {
-  "description": "Package description",
+  "description": "colis description",
+  "vileDistination": "city name",
   "receiver": {
-    "id": "receiver-id"
+    "id": "receiver_id"
   },
   "sender": {
-    "id": "sender-id"
+    "id": "sender_id"
   },
+  "products": [
+    {
+      "nom": "product_name",
+      "quantity": 0,
+      "category": "product_category",
+      "poids": 0,
+      "price": 0
+    },
+    {
+      "id": "exist_product_id",
+      "quantity": "product_quantity"
+    }
+  ],
   "city": {
-    "id": "zone-id"
+    "id": "zone_id"
   },
-  "productIds": ["product-id-1", "product-id-2"],
-  "priority": "URGENT",
-  "status": "CREATED"
+  "priority": "colis_priority"
 }
 ```
 
@@ -150,7 +162,6 @@ POST /api/colis
 - Automatically calculates total weight from products
 - Creates initial history entry
 - Sends email notification to sender
-- Sets initial status to `CREATED`
 
 **Response:**
 ```json
@@ -166,7 +177,7 @@ POST /api/colis
     "sender": {...},
     "receiver": {...},
     "city": {...},
-    "productsList": [...],
+    "products": [...],
     "historiqueLivraisonList": [...]
   }
 }
