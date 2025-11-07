@@ -11,9 +11,7 @@ import com.smartlogi.mail.EmailDetails;
 import com.smartlogi.mail.service.EmailService;
 import com.smartlogi.mapper.*;
 import com.smartlogi.model.*;
-import com.smartlogi.repository.ColisProductRepository;
-import com.smartlogi.repository.ColisRepository;
-import com.smartlogi.repository.ProductRepository;
+import com.smartlogi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,9 +39,11 @@ public class ColisService {
     private final ProductRepository productRepository;
     private final EmailService emailService;
     private final ColisProductRepository colisProductRepository;
+    private final ReceiverRepository receiverRepository;
+    private final SenderRepository senderRepository;
 
     @Autowired
-    public ColisService(ColisProductRepository colisProductRepository, EmailService emailService, ProductRepository productRepository, LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
+    public ColisService(SenderRepository senderRepository, ReceiverRepository receiverRepository, ColisProductRepository colisProductRepository, EmailService emailService, ProductRepository productRepository, LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
         this.senderService = senderService;
@@ -57,13 +57,39 @@ public class ColisService {
         this.productRepository = productRepository;
         this.emailService = emailService;
         this.colisProductRepository = colisProductRepository;
+        this.receiverRepository = receiverRepository;
+        this.senderRepository = senderRepository;
     }
 
     @Transactional
     public ColisResponseDTO saveColis(ColisRequestDTO dto) {
         ZoneResponseDTO cityDTO = cityService.findCityById(dto.getCity().getId());
-        Receiver receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
-        Sender senderEntity = senderService.findEntityById(dto.getSender().getId());
+
+        Receiver receiverEntity;
+        if (dto.getReceiver().getId() != null && !dto.getReceiver().getId().isEmpty()) {
+            receiverEntity = receiverService.findEntityById(dto.getReceiver().getId());
+        } else {
+            receiverEntity = new Receiver();
+            receiverEntity.setNom(dto.getReceiver().getNom());
+            receiverEntity.setPrenom(dto.getReceiver().getPrenom());
+            receiverEntity.setEmail(dto.getReceiver().getEmail());
+            receiverEntity.setTelephone(dto.getReceiver().getTelephone());
+            receiverEntity.setAdresse(dto.getReceiver().getAdresse());
+            receiverEntity = receiverRepository.save(receiverEntity);
+        }
+
+        Sender senderEntity;
+        if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
+            senderEntity = senderService.findEntityById(dto.getSender().getId());
+        } else {
+            senderEntity = new Sender();
+            senderEntity.setNom(dto.getSender().getNom());
+            senderEntity.setPrenom(dto.getSender().getPrenom());
+            senderEntity.setEmail(dto.getSender().getEmail());
+            senderEntity.setTelephone(dto.getSender().getTelephone());
+            senderEntity.setAdresse(dto.getSender().getAdresse());
+            senderEntity = senderRepository.save(senderEntity);
+        }
 
         Colis colis = colisMapper.toEntity(dto);
         colis.setVileDistination(dto.getVileDistination());
@@ -123,7 +149,6 @@ public class ColisService {
 
         return colisMapper.toDTO(colis);
     }
-
 
     public ColisResponseDTO findColisById(String colis_id){
         Colis colis = colisRepository.findById(colis_id)

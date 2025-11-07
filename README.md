@@ -133,10 +133,18 @@ POST /api/colis
   "description": "colis description",
   "vileDistination": "city name",
   "receiver": {
-    "id": "receiver_id"
+    "prenom": "sender_first_name",
+    "nom": "receiver_last_name",
+    "telephone": "receiver_phone_number",
+    "email": "receiver_email",
+    "adresse": "receiver_adress"
   },
   "sender": {
-    "id": "sender_id"
+    "nom": "sender_last_name",
+    "prenom": "sender_first_name",
+    "adresse": "sender_adress",
+    "email": "sender_email",
+    "telephone": "sender_phone_number"
   },
   "products": [
     {
@@ -162,6 +170,8 @@ POST /api/colis
 - Automatically calculates total weight from products
 - Creates initial history entry
 - Sends email notification to sender
+- You can enter infos or id of receiver and sender if we have a new sender or receiver
+- Create or add products from database.
 
 **Response:**
 ```json
