@@ -67,8 +67,8 @@ public class ColisController {
     @Operation(summary = "Get colis for a client", description = "Retrieve all colis linked to a specific client")
     @GetMapping("/client/{id}")
     public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(
-            @PathVariable("id") String sender_id) {
-        return ResponseEntity.ok(new ApiResponse<>("Colis du client récupérés", colisService.findAllColisForClient(sender_id)));
+            @PathVariable("id") String senderId) {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du client récupérés", colisService.findAllColisForClient(senderId)));
     }
 
     @Operation(summary = "Get colis for a receiver", description = "Retrieve all colis sent to a specific receiver")
@@ -117,8 +117,8 @@ public class ColisController {
 
     @Operation(summary = "Delete a colis", description = "Remove a colis from the system by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colis_id) {
-        colisService.deleteColis(colis_id);
+    public ResponseEntity<ApiResponse> deleteColis(@PathVariable("id") String colisId) {
+        colisService.deleteColis(colisId);
         return ResponseEntity.ok(new ApiResponse<>("Colis supprimé avec succès", null));
     }
 

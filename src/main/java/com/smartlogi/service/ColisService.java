@@ -7,7 +7,6 @@ import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import com.smartlogi.exception.OperationNotAllowedException;
 import com.smartlogi.exception.ResourceNotFoundException;
-import com.smartlogi.mail.EmailDetails;
 import com.smartlogi.mail.service.EmailService;
 import com.smartlogi.mapper.*;
 import com.smartlogi.model.*;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,31 +30,37 @@ public class ColisService {
     private final ReceiverService receiverService;
     private final SenderService senderService;
     private final ZoneMapper zoneMapper;
-    private ReceiverMapper receiverMapper;
     private final SenderMapper senderMapper;
     private final LivreurService livreurService;
-    private LivreurMapper livreurMapper;
     private final ProductRepository productRepository;
     private final EmailService emailService;
-    private final ColisProductRepository colisProductRepository;
     private final ReceiverRepository receiverRepository;
     private final SenderRepository senderRepository;
 
     @Autowired
-    public ColisService(SenderRepository senderRepository, ReceiverRepository receiverRepository, ColisProductRepository colisProductRepository, EmailService emailService, ProductRepository productRepository, LivreurMapper livreurMapper, LivreurService livreurService, ZoneMapper zoneMapper, ReceiverMapper receiverMapper, SenderMapper senderMapper, ColisRepository colisRepository, CityService cityService, ColisMapper colisMapper, ReceiverService receiverService, SenderService senderService){
+    public ColisService(SenderRepository senderRepository,
+                        ReceiverRepository receiverRepository,
+                        EmailService emailService,
+                        ProductRepository productRepository,
+                        LivreurService livreurService,
+                        ZoneMapper zoneMapper,
+                        SenderMapper senderMapper,
+                        ColisRepository colisRepository,
+                        CityService cityService,
+                        ColisMapper colisMapper,
+                        ReceiverService receiverService,
+                        SenderService senderService
+    ){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
         this.senderService = senderService;
         this.colisMapper = colisMapper;
         this.receiverService = receiverService;
         this.zoneMapper = zoneMapper;
-        this.receiverMapper = receiverMapper;
         this.senderMapper = senderMapper;
         this.livreurService = livreurService;
-        this.livreurMapper = livreurMapper;
         this.productRepository = productRepository;
         this.emailService = emailService;
-        this.colisProductRepository = colisProductRepository;
         this.receiverRepository = receiverRepository;
         this.senderRepository = senderRepository;
     }
@@ -333,7 +337,7 @@ public class ColisService {
 
         colis.setStatus(status);
 
-        if(colis.getStatus() == Status.IN_STOCK);{
+        if(colis.getStatus() == Status.IN_STOCK){
             colis.setLivreur(null);
         }
 
