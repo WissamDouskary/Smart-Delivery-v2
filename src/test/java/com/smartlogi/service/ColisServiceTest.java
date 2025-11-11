@@ -413,4 +413,16 @@ class ColisServiceTest {
         verify(colisRepository).delete(any(Colis.class));
         verify(colisRepository).findById("co1");
     }
+
+    @Test
+    void testDeleteColis_ResourceNotFoundException(){
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+
+        when(colisRepository.findById("co2")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> colisService.deleteColis("co1")
+        );
+    }
 }
