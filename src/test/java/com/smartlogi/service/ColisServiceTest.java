@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -123,6 +124,14 @@ class ColisServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () ->
                 colisService.findAllWithFilter(null, null, null, null, pageable)
+        );
+    }
+
+    @Test
+    void testFindAllWithFilter_InvalidPriority_ThrowsException(){
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThrows(ResourceNotFoundException.class, () ->
+                colisService.findAllWithFilter(null, null, null, "INVALID", pageable)
         );
     }
 
@@ -424,5 +433,32 @@ class ColisServiceTest {
         assertThrows(ResourceNotFoundException.class,
                 () -> colisService.deleteColis("co1")
         );
+    }
+
+    // get summary test
+    @Test
+    void getColisSummary_Success(){
+        Zone zone1 = new Zone();
+        zone1.setId("zo1");
+        zone1.setNom("Agadir");
+
+        Colis co1 = new Colis();
+        co1.setId("co1");
+        co1.setStatus(Status.CREATED);
+        co1.setPriority(Priority.NORMALE);
+        co1.setCity(zone1);
+
+        Colis co2 = new Colis();
+        co2.setId("co2");
+        co2.setStatus(Status.IN_STOCK);
+        co2.setPriority(Priority.NORMALE);
+        co2.setCity(zone1);
+
+        when(colisRepository.findAll()).thenReturn(List.of(co1, co2));
+
+        Map<String, Object> summary = colisService.getColisSummary();
+
+        assertNotNull(summary);
+        assertEquals(3, summary.size());
     }
 }
