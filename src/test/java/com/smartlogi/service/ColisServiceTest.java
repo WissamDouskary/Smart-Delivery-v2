@@ -301,6 +301,7 @@ class ColisServiceTest {
         assertTrue(exception.getMessage().contains("Aucun colis avec id"));
     }
 
+    // update colis method test
     @Test
     void testUpdateColis_Success() {
         // 1️⃣ Given existing Colis in DB
@@ -397,5 +398,19 @@ class ColisServiceTest {
         });
 
         verify(colisRepository, never()).save(any());
+    }
+
+    // delete colis method test
+    @Test
+    void testDeleteColis_Success(){
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
+
+        colisService.deleteColis("co1");
+
+        verify(colisRepository).delete(any(Colis.class));
+        verify(colisRepository).findById("co1");
     }
 }
