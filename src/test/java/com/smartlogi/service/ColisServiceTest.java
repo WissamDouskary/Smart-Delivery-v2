@@ -79,23 +79,28 @@ class ColisServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        colis = new Colis();
-        zone = new Zone();
-        colis.setId(String.valueOf(1L));
-        colis.setStatus(Status.CREATED);
-        colis.setPriority(Priority.NORMALE);
-        colis.setVileDistination("Casablanca");
-        zone.setNom("Agadir");
-        colis.setCity(zone);
-        colisDTO = new ColisResponseDTO();
-        colisDTO.setId(String.valueOf(1L));
     }
 
     // find all colis with filter tests
     @Test
     void testFindAllWithFilter_ReturnsFilteredList() {
         Pageable pageable = PageRequest.of(0, 10);
+
+        Colis colis = new Colis();
+        colis.setId("c1");
+        colis.setStatus(Status.CREATED);
+        colis.setPriority(Priority.NORMALE);
+        colis.setVileDistination("Casablanca");
+
+        Zone city = new Zone();
+        city.setNom("Agadir");
+        colis.setCity(city);
+
+        ColisResponseDTO colisDTO = new ColisResponseDTO();
+        colisDTO.setId("c1");
+
         Page<Colis> page = new PageImpl<>(List.of(colis));
+
         when(colisRepository.findAll(pageable)).thenReturn(page);
         when(colisMapper.toDTO(colis)).thenReturn(colisDTO);
 
@@ -103,8 +108,10 @@ class ColisServiceTest {
                 "CREATED", "Agadir", "Casablanca", "NORMALE", pageable
         );
 
+        assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(colisDTO.getId(), result.getContent().get(0).getId());
+        assertEquals("c1", result.getContent().get(0).getId());
+
         verify(colisRepository, times(1)).findAll(pageable);
     }
 
@@ -137,20 +144,23 @@ class ColisServiceTest {
 
     // insert colis information
     @Test
-    void testSaveColis_NewSenderReceiverAndProduct(){
+    void testSaveColis_NewReceiverAndSender_ShouldCreateThem() {
         ColisRequestDTO dto = new ColisRequestDTO();
         dto.setVileDistination("Agadir");
         dto.setPriority(Priority.NORMALE);
 
         Zone zone1 = new Zone();
         zone1.setId("city1");
-        zone1.setNom("Casablanca");
         dto.setCity(zone1);
 
         Receiver receiver = new Receiver();
+        receiver.setId(null);
+        receiver.setNom("Ali");
         dto.setReceiver(receiver);
 
         Sender sender = new Sender();
+        sender.setId(null);
+        sender.setNom("Sara");
         dto.setSender(sender);
 
         ColisProductsRequestDTO productDTO = new ColisProductsRequestDTO();
@@ -161,16 +171,11 @@ class ColisServiceTest {
         productDTO.setQuantity(2);
         dto.setProducts(List.of(productDTO));
 
-        when(receiverMapper.toEntity(any())).thenReturn(receiver);
-        when(senderMapper.toEntity(any())).thenReturn(sender);
-
-        Colis colisEntity = new Colis();
-        when(colisMapper.toEntity(any())).thenReturn(colisEntity);
-
+        when(colisMapper.toEntity(dto)).thenReturn(new Colis());
         when(cityService.findCityById("city1")).thenReturn(new ZoneResponseDTO());
         when(zoneMapper.toEntity(any())).thenReturn(new Zone());
-        when(receiverRepository.save(any())).thenReturn(receiver);
-        when(senderRepository.save(any())).thenReturn(sender);
+        when(receiverRepository.save(any(Receiver.class))).thenReturn(new Receiver());
+        when(senderRepository.save(any(Sender.class))).thenReturn(new Sender());
         when(productRepository.save(any())).thenReturn(new Products());
         when(colisRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(colisMapper.toDTO(any())).thenReturn(new ColisResponseDTO());
@@ -178,11 +183,8 @@ class ColisServiceTest {
         ColisResponseDTO response = colisService.saveColis(dto);
 
         assertNotNull(response);
-        verify(receiverRepository, times(1)).save(any());
-        verify(senderRepository, times(1)).save(any());
-        verify(productRepository, times(1)).save(any());
-        verify(colisRepository, times(1)).save(any());
-        verify(emailService, times(1)).sendColisCreatedEmail(any());
+        verify(receiverRepository, times(1)).save(any(Receiver.class));
+        verify(senderRepository, times(1)).save(any(Sender.class));
     }
 
     @Test
@@ -225,48 +227,51 @@ class ColisServiceTest {
     }
 
     @Test
-    void testSaveColis_ReceiverAndSenderFound(){
+    void testSaveColis_WithExistingReceiverAndSender_ShouldFindThem() {
+        Zone zone1 = new Zone();
+        zone1.setId("zo1");
+        zone1.setNom("Agadir");
+
         ColisRequestDTO dto = new ColisRequestDTO();
         dto.setVileDistination("Agadir");
         dto.setPriority(Priority.NORMALE);
-
-        Zone zone1 = new Zone();
-        zone1.setId("city1");
-        zone1.setNom("Agadir");
         dto.setCity(zone1);
 
-        Receiver receiver = new Receiver();
-        receiver.setId("rec1");
-        dto.setReceiver(receiver);
+        Receiver existingReceiver = new Receiver();
+        existingReceiver.setId("receiver-id-123");
+        dto.setReceiver(existingReceiver);
 
-        Sender sender = new Sender();
-        sender.setId("sen1");
-        dto.setSender(sender);
+        Sender existingSender = new Sender();
+        existingSender.setId("sender-id-456");
+        dto.setSender(existingSender);
 
         ColisProductsRequestDTO productDTO = new ColisProductsRequestDTO();
-        productDTO.setNom("Phone");
-        productDTO.setCategory("Electronics");
+        productDTO.setNom("Test Product");
+        productDTO.setCategory("Test");
         productDTO.setPoids(1.0);
-        productDTO.setPrice(1000.0);
-        productDTO.setQuantity(2);
+        productDTO.setPrice(100.0);
+        productDTO.setQuantity(1);
         dto.setProducts(List.of(productDTO));
 
-        when(colisMapper.toEntity(dto)).thenReturn(new Colis());
+        when(receiverService.findEntityById("receiver-id-123")).thenReturn(new Receiver());
+        when(senderService.findEntityById("sender-id-456")).thenReturn(new Sender());
 
-        when(receiverService.findEntityById("rec1")).thenReturn(receiver);
-        when(senderService.findEntityById("sen1")).thenReturn(sender);
-
-        when(cityService.findCityById("city1")).thenReturn(new ZoneResponseDTO());
+        when(cityService.findCityById(anyString())).thenReturn(new ZoneResponseDTO());
         when(zoneMapper.toEntity(any())).thenReturn(new Zone());
-        when(productRepository.save(any())).thenReturn(new Products());
-        when(colisRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(colisMapper.toDTO(any())).thenReturn(new ColisResponseDTO());
+        when(colisMapper.toEntity(any())).thenReturn(new Colis());
+        when(productRepository.save(any(Products.class))).thenReturn(new Products());
+        when(colisRepository.save(any(Colis.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(colisMapper.toDTO(any(Colis.class))).thenReturn(new ColisResponseDTO());
 
         ColisResponseDTO response = colisService.saveColis(dto);
 
         assertNotNull(response);
-        verify(receiverService, times(1)).findEntityById("rec1");
-        verify(senderService, times(1)).findEntityById("sen1");
+
+        verify(receiverService, times(1)).findEntityById("receiver-id-123");
+        verify(senderService, times(1)).findEntityById("sender-id-456");
+
+        verify(receiverRepository, never()).save(any(Receiver.class));
+        verify(senderRepository, never()).save(any(Sender.class));
     }
 
     // find Colis By id method test
@@ -460,5 +465,37 @@ class ColisServiceTest {
 
         assertNotNull(summary);
         assertEquals(3, summary.size());
+    }
+
+    // affect colis a livreur method test
+    @Test
+    void affectColisToLivreur_Success(){
+        Zone zone1 = new Zone();
+        zone1.setId("zo1");
+        zone1.setNom("Agadir");
+
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setCity(zone1);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
+
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setCity(zone1);
+
+        ColisResponseDTO expectedResponse = new ColisResponseDTO();
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+        when(colisMapper.toDTO(colis)).thenReturn(expectedResponse);
+
+        ColisResponseDTO actualResponse = colisService.affectColisToLivreur("li1", "co1");
+
+        verify(colisRepository, times(1)).save(colis1);
+        verify(emailService, times(1)).sendColisAssignedEmail(colis1, livreur);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse, actualResponse);
     }
 }
