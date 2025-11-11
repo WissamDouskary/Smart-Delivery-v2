@@ -2,8 +2,6 @@ package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.dto.requestsDTO.ReceiverRequestDTO;
-import com.smartlogi.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
 import com.smartlogi.enums.Priority;
@@ -254,5 +252,46 @@ class ColisServiceTest {
         assertNotNull(response);
         verify(receiverService, times(1)).findEntityById("rec1");
         verify(senderService, times(1)).findEntityById("sen1");
+    }
+
+    // find Colis By id method test
+    @Test
+    void testFindColisById_Success(){
+        Colis colisEntity = new Colis();
+        colisEntity.setId("co1");
+
+        ColisResponseDTO colisDTO = new ColisResponseDTO();
+        colisDTO.setId("co1");
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colisEntity));
+
+        when(colisMapper.toDTO(colisEntity)).thenReturn(colisDTO);
+
+        ColisResponseDTO result = colisService.findColisById("co1");
+
+        assertNotNull(result);
+        assertEquals("co1", result.getId());
+        verify(colisRepository, times(1)).findById("co1");
+        verify(colisMapper, times(1)).toDTO(colisEntity);
+    }
+
+    @Test
+    void  testFindColisById_ResourceNotFoundException(){
+        Colis colisEntity = new Colis();
+        colisEntity.setId("co1");
+
+        ColisResponseDTO colisDTO = new ColisResponseDTO();
+        colisDTO.setId("co1");
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.empty());
+
+        when(colisMapper.toDTO(colisEntity)).thenReturn(colisDTO);
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> colisService.findColisById("co1")
+        );
+
+        assertTrue(exception.getMessage().contains("Aucun colis avec id"));
     }
 }
