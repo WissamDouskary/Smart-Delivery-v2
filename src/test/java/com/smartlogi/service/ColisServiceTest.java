@@ -3,6 +3,7 @@ package com.smartlogi.service;
 import com.smartlogi.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.dto.responseDTO.ColisResponseDTO;
+import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
 import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
 import com.smartlogi.enums.Priority;
@@ -763,5 +764,48 @@ class ColisServiceTest {
         assertEquals(dtoList.size(), result.size());
         assertEquals(dtoList, result);
         verify(colisMapper, times(1)).toResponseDTOList(colisList);
+    }
+
+    @Test
+    void findAllColisForReceiver_NoColis_ShouldThrowException() {
+        String receiverId = "rec1";
+
+        when(colisRepository.findColisByReceiver_Id(receiverId)).thenReturn(new ArrayList<>());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> colisService.findAllColisForReciever(receiverId));
+
+        assertEquals("No colis found for this receiver", exception.getMessage());
+        verify(senderMapper, never()).toDTO(any());
+    }
+
+    @Test
+    void findAllColisForReceiver_WithColis_ShouldReturnSummaryDTOList() {
+        String receiverId = "rec1";
+
+        Colis colis1 = new Colis();
+        colis1.setStatus(Status.CREATED);
+        colis1.setSender(new Sender());
+
+        Colis colis2 = new Colis();
+        colis2.setStatus(Status.LIVRED);
+        colis2.setSender(new Sender());
+
+        List<Colis> colisList = List.of(colis1, colis2);
+
+        ColisSummaryDTO dto1 = new ColisSummaryDTO();
+        ColisSummaryDTO dto2 = new ColisSummaryDTO();
+
+        when(colisRepository.findColisByReceiver_Id(receiverId)).thenReturn(colisList);
+        when(senderMapper.toDTO(colis1.getSender())).thenReturn(dto1.getSender());
+        when(senderMapper.toDTO(colis2.getSender())).thenReturn(dto2.getSender());
+
+        List<ColisSummaryDTO> result = colisService.findAllColisForReciever(receiverId);
+
+        assertEquals(2, result.size());
+        assertEquals(colisList.get(0).getStatus(), result.get(0).getStatus());
+        assertEquals(colisList.get(1).getStatus(), result.get(1).getStatus());
+        verify(senderMapper, times(1)).toDTO(colis1.getSender());
+        verify(senderMapper, times(1)).toDTO(colis2.getSender());
     }
 }
