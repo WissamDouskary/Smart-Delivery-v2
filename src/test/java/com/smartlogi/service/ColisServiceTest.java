@@ -608,4 +608,125 @@ class ColisServiceTest {
         verify(colisRepository, never()).save(any());
         verify(emailService, never()).sendColisAssignedEmail(any(), any());
     }
+
+    // update colis by livreur
+    @Test
+    void updateColisByLivreur_StatusChanged_ShouldAddHistoriqueAndSendEmail() {
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setNom("Ali");
+        livreur.setPrenom("Amine");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.CREATED);
+        colis.setLivreur(livreur);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        ColisResponseDTO expected = new ColisResponseDTO();
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
+        when(colisMapper.toDTO(colis)).thenReturn(expected);
+
+        ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.LIVRED, "co1");
+
+        assertEquals(Status.LIVRED, colis.getStatus());
+        assertEquals(1, colis.getHistoriqueLivraisonList().size());
+        verify(emailService, times(1))
+                .sendColisStatusUpdatedEmail(colis, livreur, Status.CREATED, Status.LIVRED);
+        verify(colisRepository, times(1)).save(colis);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void updateColisByLivreur_StatusNotChanged_ShouldNotSendEmailOrAddHistorique() {
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.CREATED);
+        colis.setLivreur(livreur);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        ColisResponseDTO expected = new ColisResponseDTO();
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
+        when(colisMapper.toDTO(colis)).thenReturn(expected);
+
+        ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.CREATED, "co1");
+
+        assertEquals(Status.CREATED, colis.getStatus());
+        assertTrue(colis.getHistoriqueLivraisonList().isEmpty());
+        verify(emailService, never()).sendColisStatusUpdatedEmail(any(), any(), any(), any());
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void updateColisByLivreur_ColisNotFound_ShouldThrowException() {
+        when(colisRepository.findById("co1")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                colisService.updateColisByLivreur("li1", Status.CREATED, "co1"));
+
+        verify(colisRepository, never()).save(any());
+        verify(emailService, never()).sendColisStatusUpdatedEmail(any(), any(), any(), any());
+    }
+
+    @Test
+    void updateColisByLivreur_NotAssignedLivreur_ShouldThrowException() {
+        Livreur assignedLivreur = new Livreur();
+        assignedLivreur.setId("li2");
+
+        Livreur currentLivreur = new Livreur();
+        currentLivreur.setId("li1");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.CREATED);
+        colis.setLivreur(assignedLivreur);
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(currentLivreur);
+
+        OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class, () ->
+                colisService.updateColisByLivreur("li1", Status.LIVRED, "co1"));
+
+        assertEquals("You can't change statut for colis not assigned to you!", exception.getMessage());
+        verify(emailService, never()).sendColisStatusUpdatedEmail(any(), any(), any(), any());
+    }
+
+    @Test
+    void updateColisByLivreur_StatusChangedToInStock_ShouldRemoveLivreur() {
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setNom("Ali");
+        livreur.setPrenom("Amine");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.CREATED);
+        colis.setLivreur(livreur);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        ColisResponseDTO expected = new ColisResponseDTO();
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
+        when(colisMapper.toDTO(colis)).thenReturn(expected);
+
+        ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.IN_STOCK, "co1");
+
+        assertNull(colis.getLivreur());
+        assertEquals(Status.IN_STOCK, colis.getStatus());
+        assertEquals(1, colis.getHistoriqueLivraisonList().size());
+        verify(emailService, times(1))
+                .sendColisStatusUpdatedEmail(colis, livreur, Status.CREATED, Status.IN_STOCK);
+        assertEquals(expected, result);
+    }
 }
