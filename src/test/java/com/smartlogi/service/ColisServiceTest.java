@@ -498,4 +498,114 @@ class ColisServiceTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
     }
+
+    @Test
+    void affectColisToLivreur_ColisNotFoundException(){
+        Zone zone1 = new Zone();
+        zone1.setId("zo1");
+        zone1.setNom("Agadir");
+
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setCity(zone1);
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                colisService.affectColisToLivreur("li1", "co1")
+        );
+
+        verify(colisRepository, never()).save(colis1);
+    }
+
+    @Test
+    void affectColisToLivreur_ColisInStockAndLivreurNotInMaroc_ShouldThrowException() {
+        Zone zoneLivreur = new Zone();
+        zoneLivreur.setNom("Agadir");
+
+        Zone zoneColis = new Zone();
+        zoneColis.setNom("Agadir");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.IN_STOCK);
+        colis.setCity(zoneColis);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setCity(zoneLivreur);
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+
+        OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
+                () -> colisService.affectColisToLivreur("li1", "co1"));
+
+        assertEquals("Colis est en stock, le livreur doit étre avec zone nom 'Maroc'!", exception.getMessage());
+        verify(colisRepository, never()).save(any());
+        verify(emailService, never()).sendColisAssignedEmail(any(), any());
+    }
+
+    @Test
+    void affectColisToLivreur_LivreurAlreadyAssigned_ShouldThrowException() {
+        Zone zone = new Zone();
+        zone.setId("zo1");
+        zone.setNom("Agadir");
+
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setCity(zone);
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setCity(zone);
+        colis.setStatus(Status.CREATED);
+        colis.setLivreur(livreur);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+
+        OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
+                () -> colisService.affectColisToLivreur("li1", "co1"));
+
+        assertEquals("livreur est deja affecter sur ce Colis", exception.getMessage());
+        verify(colisRepository, never()).save(any());
+        verify(emailService, never()).sendColisAssignedEmail(any(), any());
+    }
+
+    @Test
+    void affectColisToLivreur_DifferentCityAndNotInStock_ShouldThrowException() {
+        Zone zoneColis = new Zone();
+        zoneColis.setId("z1");
+        zoneColis.setNom("Agadir");
+
+        Zone zoneLivreur = new Zone();
+        zoneLivreur.setId("z2");
+        zoneLivreur.setNom("Casablanca");
+
+        Colis colis = new Colis();
+        colis.setId("co1");
+        colis.setStatus(Status.CREATED);
+        colis.setCity(zoneColis);
+        colis.setHistoriqueLivraisonList(new ArrayList<>());
+
+        Livreur livreur = new Livreur();
+        livreur.setId("li1");
+        livreur.setCity(zoneLivreur);
+
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(livreurService.findEntityById("li1")).thenReturn(livreur);
+
+        OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
+                () -> colisService.affectColisToLivreur("li1", "co1"));
+
+        assertEquals("livreur ville est different de colis ville!", exception.getMessage());
+        verify(colisRepository, never()).save(any());
+        verify(emailService, never()).sendColisAssignedEmail(any(), any());
+    }
 }
