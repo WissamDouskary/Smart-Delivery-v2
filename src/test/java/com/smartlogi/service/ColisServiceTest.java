@@ -72,9 +72,6 @@ class ColisServiceTest {
     private LivreurService livreurService;
 
     private Colis colis;
-    private ColisResponseDTO colisDTO;
-    private Zone zone;
-
 
     @BeforeEach
     void setUp() {
@@ -728,5 +725,43 @@ class ColisServiceTest {
         verify(emailService, times(1))
                 .sendColisStatusUpdatedEmail(colis, livreur, Status.CREATED, Status.IN_STOCK);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void findAllColisForClient_NoColis_ShouldThrowException() {
+        String senderId = "client1";
+
+        when(colisRepository.findColisBySender_Id(senderId)).thenReturn(new ArrayList<>());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> colisService.findAllColisForClient(senderId));
+
+        assertEquals("Aucun Colis pour ce client", exception.getMessage());
+        verify(colisMapper, never()).toResponseDTOList(any());
+    }
+
+    @Test
+    void findAllColisForClient_WithColis_ShouldReturnDTOList() {
+        String senderId = "client1";
+
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        Colis colis2 = new Colis();
+        colis2.setId("co2");
+
+        List<Colis> colisList = List.of(colis1, colis2);
+
+        List<ColisResponseDTO> dtoList = new ArrayList<>();
+        dtoList.add(new ColisResponseDTO());
+        dtoList.add(new ColisResponseDTO());
+
+        when(colisRepository.findColisBySender_Id(senderId)).thenReturn(colisList);
+        when(colisMapper.toResponseDTOList(colisList)).thenReturn(dtoList);
+
+        List<ColisResponseDTO> result = colisService.findAllColisForClient(senderId);
+
+        assertEquals(dtoList.size(), result.size());
+        assertEquals(dtoList, result);
+        verify(colisMapper, times(1)).toResponseDTOList(colisList);
     }
 }

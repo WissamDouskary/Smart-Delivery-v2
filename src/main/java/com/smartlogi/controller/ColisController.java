@@ -21,7 +21,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/colis")
-@CrossOrigin("*")
 @Tag(name = "Colis Management", description = "Endpoints for managing colis (packages)")
 public class ColisController {
 
