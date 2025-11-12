@@ -2,10 +2,7 @@ package com.smartlogi.service;
 
 import com.smartlogi.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.dto.responseDTO.ColisResponseDTO;
-import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
-import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
-import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
+import com.smartlogi.dto.responseDTO.*;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
 import com.smartlogi.exception.OperationNotAllowedException;
@@ -846,5 +843,30 @@ class ColisServiceTest {
         assertEquals(dtoList.size(), result.size());
         assertEquals(dtoList, result);
         verify(colisMapper, times(1)).toResponseDTOList(colisList);
+    }
+
+    @Test
+    void getLivraisonStatsParLivreurEtZone_NoStats_ShouldThrowException() {
+        when(colisRepository.getLivraisonStatsParLivreurEtZone()).thenReturn(new ArrayList<>());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> colisService.getLivraisonStatsParLivreurEtZone());
+
+        assertEquals("aucun livraison affecter a une livreur!", exception.getMessage());
+    }
+
+    @Test
+    void getLivraisonStatsParLivreurEtZone_WithStats_ShouldReturnList() {
+        LivraisonStatsDTO stat1 = new LivraisonStatsDTO();
+        LivraisonStatsDTO stat2 = new LivraisonStatsDTO();
+
+        List<LivraisonStatsDTO> statsList = List.of(stat1, stat2);
+
+        when(colisRepository.getLivraisonStatsParLivreurEtZone()).thenReturn(statsList);
+
+        List<LivraisonStatsDTO> result = colisService.getLivraisonStatsParLivreurEtZone();
+
+        assertEquals(2, result.size());
+        assertEquals(statsList, result);
     }
 }
