@@ -871,42 +871,32 @@ class ColisServiceTest {
     }
 
     @Test
-    void getColisHistorique_NotColis_ShouldThrowException(){
-        Colis colis1 = new Colis();
-        colis1.setId("co1");
+    void getColisHistorique_ColisNotFound_ShouldThrowException() {
+        String colisId = "colis123";
+        when(colisRepository.findById(colisId)).thenReturn(Optional.empty());
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.empty());
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> colisService.getColisHistorique(colisId));
 
-
-        verify(colisMapper, never()).toDTO(colis1);
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
-                colisService.getColisHistorique("co1")
-        );
-        assertTrue(exception.getMessage().contains("aucun colis avec id"));
+        assertEquals("aucun colis avec id: " + colisId, exception.getMessage());
+        verify(colisRepository, times(1)).findById(colisId);
+        verifyNoInteractions(colisMapper);
     }
 
     @Test
-    void getColisHistorique_WithColis_ShouldReturnColisHistorique(){
-        Colis colis1 = new Colis();
-        colis1.setId("co1");
+    void getColisHistorique_ColisFound_ShouldReturnMappedDTO() {
+        String colisId = "colis123";
+        Colis colis = new Colis();
+        ColisResponseDTO dto = new ColisResponseDTO();
 
-        HistoriqueLivraison histo = new HistoriqueLivraison();
-        histo.setId("hi1");
-        histo.setComment("created");
-        histo.setColis(colis1);
+        when(colisRepository.findById(colisId)).thenReturn(Optional.of(colis));
+        when(colisMapper.toDTO(colis)).thenReturn(dto);
 
-        HistoriqueLivraison histo2 = new HistoriqueLivraison();
-        histo2.setId("hi2");
-        histo2.setComment("created");
+        ColisResponseDTO result = colisService.getColisHistorique(colisId);
 
-        colis1.getHistoriqueLivraisonList().add(histo);
-        colis1.getHistoriqueLivraisonList().add(histo2);
-
-        ColisResponseDTO colisResponseDTO = new ColisResponseDTO();
-
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
-        when(colisMapper.toDTO(colis1)).thenReturn(colisResponseDTO);
-
-        assertEquals(2, colis1.getHistoriqueLivraisonList().size());
+        assertNotNull(result);
+        assertEquals(dto, result);
+        verify(colisRepository, times(1)).findById(colisId);
+        verify(colisMapper, times(1)).toDTO(colis);
     }
 }
