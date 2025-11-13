@@ -41,7 +41,6 @@ class SenderControllerIntegrationTest {
         colisRepository.deleteAll();
     }
 
-    // Test POST /api/sender (real call with DB)
     @Test
     void saveSender_ShouldPersistAndReturnSuccessResponse() throws Exception {
         SenderRequestDTO request = new SenderRequestDTO();
@@ -64,7 +63,6 @@ class SenderControllerIntegrationTest {
         assert allSenders.get(0).getNom().equals("Integration Test");
     }
 
-    // Test GET /api/sender/{id}
     @Test
     void findSenderById_ShouldReturnSenderFromDB() throws Exception {
         Sender sender = new Sender();

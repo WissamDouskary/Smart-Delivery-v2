@@ -36,7 +36,6 @@ class ProductControllerIntegrationTest {
         productRepository.deleteAll();
     }
 
-    // Test POST /api/product
     @Test
     void saveProduct_ShouldPersistAndReturnProduct() throws Exception {
         ProductRequestDTO request = new ProductRequestDTO();
@@ -57,7 +56,6 @@ class ProductControllerIntegrationTest {
         assert(products.get(0).getNom().equals("Laptop"));
     }
 
-    // Test GET /api/product
     @Test
     void findAll_ShouldReturnAllProducts() throws Exception {
         Products p1 = new Products();

@@ -44,7 +44,6 @@ class ProductControllerTest {
         productResponse.setPrice(10000.0);
     }
 
-    // Test POST /api/product
     @Test
     void saveProduct_ShouldReturnSuccessResponse() throws Exception {
         ProductRequestDTO request = new ProductRequestDTO();
@@ -64,7 +63,6 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.data.price", is(10000.0)));
     }
 
-    // Test GET /api/product
     @Test
     void findAll_ShouldReturnListOfProducts() throws Exception {
         Mockito.when(productService.findAll()).thenReturn(List.of(productResponse));

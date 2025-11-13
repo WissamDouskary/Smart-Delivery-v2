@@ -8,7 +8,6 @@ import com.smartlogi.dto.responseDTO.ColisSummaryDTO;
 import com.smartlogi.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.enums.Priority;
 import com.smartlogi.enums.Status;
-import com.smartlogi.model.Products;
 import com.smartlogi.model.Receiver;
 import com.smartlogi.model.Sender;
 import com.smartlogi.model.Zone;
@@ -85,7 +84,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis ajouté avec succès")));
     }
 
-    // Test GET /api/colis/{id}
     @Test
     void findColisById_ShouldReturnColis() throws Exception {
         Mockito.when(colisService.findColisById("1")).thenReturn(colisResponse);
@@ -95,7 +93,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis donner avec success")));
     }
 
-    // Test GET /api/colis (findAll with filters)
     @Test
     void findAllColis_ShouldReturnPagedResult() throws Exception {
         Mockito.when(colisService.findAllWithFilter(any(), any(), any(), any(), Mockito.any(Pageable.class)))
@@ -106,7 +103,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Liste des colis récupérée avec succès")));
     }
 
-    // Test GET /api/colis/summary
     @Test
     void getSummary_ShouldReturnSummaryMap() throws Exception {
         Map<String, Object> summary = Map.of("livrés", 5, "en attente", 3);
@@ -118,7 +114,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.data.livrés", is(5)));
     }
 
-    // Test GET /api/colis/client/{id}
     @Test
     void findAllColisForClient_ShouldReturnList() throws Exception {
         Mockito.when(colisService.findAllColisForClient("10")).thenReturn(List.of(colisResponse));
@@ -128,7 +123,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis du client récupérés")));
     }
 
-    // Test GET /api/colis/receiver/{id}
     @Test
     void findAllColisForReceiver_ShouldReturnList() throws Exception {
         ColisSummaryDTO summaryDTO = new ColisSummaryDTO();
@@ -139,7 +133,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis du destinataire récupérés")));
     }
 
-    // Test GET /api/colis/livreur/{id}
     @Test
     void findAllColisByLivreur_ShouldReturnList() throws Exception {
         Mockito.when(colisService.findAllColisForLivreurs("55")).thenReturn(List.of(colisResponse));
@@ -149,7 +142,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis du livreur récupérés")));
     }
 
-    // Test PATCH /api/colis/{colis_id}/livreur/{livreur_id}
     @Test
     void updateColisByLivreur_ShouldReturnUpdatedColis() throws Exception {
         Mockito.when(colisService.updateColisByLivreur(any(), any(), any())).thenReturn(colisResponse);
@@ -161,7 +153,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Statut du colis mis à jour")));
     }
 
-    // Test PATCH /api/colis/affect/{colis_id}/livreur/{livreur_id}
     @Test
     void affectColisToLivreur_ShouldReturnSuccess() throws Exception {
         Mockito.when(colisService.affectColisToLivreur(any(), any())).thenReturn(colisResponse);
@@ -171,7 +162,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis affecté au livreur avec succès")));
     }
 
-    // Test PUT /api/colis/{id}
     @Test
     void updateColis_ShouldReturnUpdatedResponse() throws Exception {
         ColisUpdateDTO updateDTO = new ColisUpdateDTO();
@@ -184,7 +174,6 @@ class ColisControllerTest {
                 .andExpect(jsonPath("$.message", is("Colis mise à jour")));
     }
 
-    // Test DELETE /api/colis/{id}
     @Test
     void deleteColis_ShouldReturnSuccessMessage() throws Exception {
         mockMvc.perform(delete("/api/colis/88"))
@@ -193,7 +182,6 @@ class ColisControllerTest {
         Mockito.verify(colisService).deleteColis("88");
     }
 
-    // Test GET /api/colis/{id}/historique
     @Test
     void getColisHistorique_ShouldReturnHistorique() throws Exception {
         Mockito.when(colisService.getColisHistorique("HX1")).thenReturn(colisResponse);

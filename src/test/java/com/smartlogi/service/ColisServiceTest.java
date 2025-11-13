@@ -480,10 +480,18 @@ class ColisServiceTest {
         livreur.setCity(zone1);
 
         ColisResponseDTO expectedResponse = new ColisResponseDTO();
+        expectedResponse.setId("co1");
+        expectedResponse.setStatus(Status.CREATED);
+
+        ZoneResponseDTO zoneResponseDTO = new ZoneResponseDTO();
+        zoneResponseDTO.setId("zo1");
+        zoneResponseDTO.setNom("Agadir");
 
         when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
-        when(colisMapper.toDTO(colis)).thenReturn(expectedResponse);
+        when(cityService.findCityById("zo1")).thenReturn(zoneResponseDTO);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis1);
+        when(colisMapper.toDTO(colis1)).thenReturn(expectedResponse);
 
         ColisResponseDTO actualResponse = colisService.affectColisToLivreur("li1", "co1");
 

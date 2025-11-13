@@ -1,7 +1,6 @@
 package com.smartlogi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.service.SenderService;
@@ -44,7 +43,6 @@ class SenderControllerTest {
         senderResponseDTO.setAdresse("Agadir");
     }
 
-    // Test POST /api/sender
     @Test
     void saveSender_ShouldReturnSuccessResponse() throws Exception {
         SenderRequestDTO requestDTO = new SenderRequestDTO();
@@ -65,7 +63,6 @@ class SenderControllerTest {
                 .andExpect(jsonPath("$.data.nom", is("John Doe")));
     }
 
-    // Test GET /api/sender/{id}
     @Test
     void findSenderById_ShouldReturnSender() throws Exception {
         Mockito.when(senderService.findById("1")).thenReturn(senderResponseDTO);
@@ -77,7 +74,6 @@ class SenderControllerTest {
                 .andExpect(jsonPath("$.data.nom", is("John Doe")));
     }
 
-    // Test GET /api/sender
     @Test
     void findAll_ShouldReturnListOfSenders() throws Exception {
         Mockito.when(senderService.findAll()).thenReturn(List.of(senderResponseDTO));
