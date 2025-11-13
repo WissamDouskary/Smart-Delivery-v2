@@ -8,7 +8,6 @@ import com.smartlogi.model.Sender;
 import com.smartlogi.repository.SenderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.List;

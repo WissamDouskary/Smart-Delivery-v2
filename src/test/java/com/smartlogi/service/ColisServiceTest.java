@@ -69,8 +69,6 @@ class ColisServiceTest {
     @Mock
     private LivreurService livreurService;
 
-    private Colis colis;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -532,17 +530,17 @@ class ColisServiceTest {
         Zone zoneColis = new Zone();
         zoneColis.setNom("Agadir");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.IN_STOCK);
-        colis.setCity(zoneColis);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.IN_STOCK);
+        colis1.setCity(zoneColis);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
         Livreur livreur = new Livreur();
         livreur.setId("li1");
         livreur.setCity(zoneLivreur);
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
 
         OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
@@ -563,14 +561,14 @@ class ColisServiceTest {
         livreur.setId("li1");
         livreur.setCity(zone);
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setCity(zone);
-        colis.setStatus(Status.CREATED);
-        colis.setLivreur(livreur);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setCity(zone);
+        colis1.setStatus(Status.CREATED);
+        colis1.setLivreur(livreur);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
 
         OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
@@ -591,17 +589,17 @@ class ColisServiceTest {
         zoneLivreur.setId("z2");
         zoneLivreur.setNom("Casablanca");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.CREATED);
-        colis.setCity(zoneColis);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setCity(zoneColis);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
         Livreur livreur = new Livreur();
         livreur.setId("li1");
         livreur.setCity(zoneLivreur);
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
 
         OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class,
@@ -620,26 +618,26 @@ class ColisServiceTest {
         livreur.setNom("Ali");
         livreur.setPrenom("Amine");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.CREATED);
-        colis.setLivreur(livreur);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setLivreur(livreur);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
         ColisResponseDTO expected = new ColisResponseDTO();
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
-        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
-        when(colisMapper.toDTO(colis)).thenReturn(expected);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis1);
+        when(colisMapper.toDTO(colis1)).thenReturn(expected);
 
         ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.LIVRED, "co1");
 
-        assertEquals(Status.LIVRED, colis.getStatus());
-        assertEquals(1, colis.getHistoriqueLivraisonList().size());
+        assertEquals(Status.LIVRED, colis1.getStatus());
+        assertEquals(1, colis1.getHistoriqueLivraisonList().size());
         verify(emailService, times(1))
-                .sendColisStatusUpdatedEmail(colis, livreur, Status.CREATED, Status.LIVRED);
-        verify(colisRepository, times(1)).save(colis);
+                .sendColisStatusUpdatedEmail(colis1, livreur, Status.CREATED, Status.LIVRED);
+        verify(colisRepository, times(1)).save(colis1);
         assertEquals(expected, result);
     }
 
@@ -648,23 +646,23 @@ class ColisServiceTest {
         Livreur livreur = new Livreur();
         livreur.setId("li1");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.CREATED);
-        colis.setLivreur(livreur);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setLivreur(livreur);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
         ColisResponseDTO expected = new ColisResponseDTO();
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
-        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
-        when(colisMapper.toDTO(colis)).thenReturn(expected);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis1);
+        when(colisMapper.toDTO(colis1)).thenReturn(expected);
 
         ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.CREATED, "co1");
 
-        assertEquals(Status.CREATED, colis.getStatus());
-        assertTrue(colis.getHistoriqueLivraisonList().isEmpty());
+        assertEquals(Status.CREATED, colis1.getStatus());
+        assertTrue(colis1.getHistoriqueLivraisonList().isEmpty());
         verify(emailService, never()).sendColisStatusUpdatedEmail(any(), any(), any(), any());
         assertEquals(expected, result);
     }
@@ -688,12 +686,12 @@ class ColisServiceTest {
         Livreur currentLivreur = new Livreur();
         currentLivreur.setId("li1");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.CREATED);
-        colis.setLivreur(assignedLivreur);
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setLivreur(assignedLivreur);
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(currentLivreur);
 
         OperationNotAllowedException exception = assertThrows(OperationNotAllowedException.class, () ->
@@ -710,26 +708,26 @@ class ColisServiceTest {
         livreur.setNom("Ali");
         livreur.setPrenom("Amine");
 
-        Colis colis = new Colis();
-        colis.setId("co1");
-        colis.setStatus(Status.CREATED);
-        colis.setLivreur(livreur);
-        colis.setHistoriqueLivraisonList(new ArrayList<>());
+        Colis colis1 = new Colis();
+        colis1.setId("co1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setLivreur(livreur);
+        colis1.setHistoriqueLivraisonList(new ArrayList<>());
 
         ColisResponseDTO expected = new ColisResponseDTO();
 
-        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis));
+        when(colisRepository.findById("co1")).thenReturn(Optional.of(colis1));
         when(livreurService.findEntityById("li1")).thenReturn(livreur);
-        when(colisRepository.save(any(Colis.class))).thenReturn(colis);
-        when(colisMapper.toDTO(colis)).thenReturn(expected);
+        when(colisRepository.save(any(Colis.class))).thenReturn(colis1);
+        when(colisMapper.toDTO(colis1)).thenReturn(expected);
 
         ColisResponseDTO result = colisService.updateColisByLivreur("li1", Status.IN_STOCK, "co1");
 
-        assertNull(colis.getLivreur());
-        assertEquals(Status.IN_STOCK, colis.getStatus());
-        assertEquals(1, colis.getHistoriqueLivraisonList().size());
+        assertNull(colis1.getLivreur());
+        assertEquals(Status.IN_STOCK, colis1.getStatus());
+        assertEquals(1, colis1.getHistoriqueLivraisonList().size());
         verify(emailService, times(1))
-                .sendColisStatusUpdatedEmail(colis, livreur, Status.CREATED, Status.IN_STOCK);
+                .sendColisStatusUpdatedEmail(colis1, livreur, Status.CREATED, Status.IN_STOCK);
         assertEquals(expected, result);
     }
 
@@ -894,17 +892,17 @@ class ColisServiceTest {
     @Test
     void getColisHistorique_ColisFound_ShouldReturnMappedDTO() {
         String colisId = "colis123";
-        Colis colis = new Colis();
+        Colis colis1 = new Colis();
         ColisResponseDTO dto = new ColisResponseDTO();
 
-        when(colisRepository.findById(colisId)).thenReturn(Optional.of(colis));
-        when(colisMapper.toDTO(colis)).thenReturn(dto);
+        when(colisRepository.findById(colisId)).thenReturn(Optional.of(colis1));
+        when(colisMapper.toDTO(colis1)).thenReturn(dto);
 
         ColisResponseDTO result = colisService.getColisHistorique(colisId);
 
         assertNotNull(result);
         assertEquals(dto, result);
         verify(colisRepository, times(1)).findById(colisId);
-        verify(colisMapper, times(1)).toDTO(colis);
+        verify(colisMapper, times(1)).toDTO(colis1);
     }
 }
