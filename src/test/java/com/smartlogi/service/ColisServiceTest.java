@@ -81,23 +81,23 @@ class ColisServiceTest {
     void testFindAllWithFilter_ReturnsFilteredList() {
         Pageable pageable = PageRequest.of(0, 10);
 
-        Colis colis = new Colis();
-        colis.setId("c1");
-        colis.setStatus(Status.CREATED);
-        colis.setPriority(Priority.NORMALE);
-        colis.setVileDistination("Casablanca");
+        Colis colis1 = new Colis();
+        colis1.setId("c1");
+        colis1.setStatus(Status.CREATED);
+        colis1.setPriority(Priority.NORMALE);
+        colis1.setVileDistination("Casablanca");
 
         Zone city = new Zone();
         city.setNom("Agadir");
-        colis.setCity(city);
+        colis1.setCity(city);
 
         ColisResponseDTO colisDTO = new ColisResponseDTO();
         colisDTO.setId("c1");
 
-        Page<Colis> page = new PageImpl<>(List.of(colis));
+        Page<Colis> page = new PageImpl<>(List.of(colis1));
 
         when(colisRepository.findAll(pageable)).thenReturn(page);
-        when(colisMapper.toDTO(colis)).thenReturn(colisDTO);
+        when(colisMapper.toDTO(colis1)).thenReturn(colisDTO);
 
         Page<ColisResponseDTO> result = colisService.findAllWithFilter(
                 "CREATED", "Agadir", "Casablanca", "NORMALE", pageable
