@@ -27,6 +27,7 @@ SmartLogi is a comprehensive logistics management system API that handles packag
 - [Business Rules](#business-rules)
 - [Error Handling](#error-handling)
 - [Response Format](#response-format)
+- [Test Coverage](#test-coverage)
 
 ## Features
 
