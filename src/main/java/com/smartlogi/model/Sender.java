@@ -21,7 +21,7 @@ public class Sender {
     private String telephone;
     private String adresse;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("sender-colis")
     private List<Colis> colisList = new ArrayList<>();
 

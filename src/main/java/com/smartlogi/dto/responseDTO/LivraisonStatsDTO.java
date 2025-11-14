@@ -13,6 +13,8 @@ public class LivraisonStatsDTO {
         this.poidsTotal = poidsTotal;
     }
 
+    public LivraisonStatsDTO(){}
+
     public String getLivreurNom() {
         return livreurNom;
     }
