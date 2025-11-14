@@ -765,6 +765,85 @@ GET /api/colis/{colis-id}/historique
 6. **Search efficiently** - Use the global search for quick lookups
 7. **Track history** - Leverage the automatic history logging for audit trails
 
+## Test Coverage
+
+This project maintains high code quality standards with comprehensive test coverage using **SonarQube** and **JaCoCo**.
+
+### Coverage Tools
+
+- **SonarQube Community**: Static code analysis and quality metrics
+- **JaCoCo**: Java code coverage library for measuring test coverage
+
+### Current Coverage Metrics
+
+Based on the latest analysis (Since November 10, 2025):
+
+- **Overall Coverage**: 80.0%
+- **New Issues**: 0
+- **Accepted Issues**: 0
+- **Security Hotspots**: 0 (Grade A)
+- **Duplications**: 0.0%
+- **Lines to Cover**: 8 new lines
+
+### Coverage by Package
+
+| Package | Instruction Coverage | Branch Coverage |
+|---------|---------------------|-----------------|
+| com.smartlogi.mapper | 22% | 10% |
+| com.smartlogi.dto.responseDTO | 52% | n/a |
+| com.smartlogi.mail.service | 3% | n/a |
+| com.smartlogi.service | 87% | 72% |
+| com.smartlogi.model | 71% | 0% |
+| com.smartlogi.exception | 11% | 0% |
+| com.smartlogi.dto.requestsDTO | 68% | n/a |
+| com.smartlogi.controller | 80% | n/a |
+| com.smartlogi.mail | 0% | n/a |
+| com.smartlogi.aspect | 73% | n/a |
+| com.smartlogi | 13% | n/a |
+| com.smartlogi.dto | 65% | n/a |
+| com.smartlogi.enums | 100% | n/a |
+
+### Test Suites
+
+The project includes comprehensive test coverage across multiple layers:
+
+**Controller Tests:**
+- ColisControllerTest
+- ProductControllerIntegrationTest
+- ProductControllerTest
+- SenderControllerIntegrationTest
+- SenderControllerTest
+
+**Service Tests:**
+- ColisServiceTest
+- SearchServiceTest
+- SenderServiceTest
+
+**Integration Tests:**
+- SmartLogiV2ApplicationTests
+
+### Running Coverage Reports
+
+To generate coverage reports locally:
+```bash
+# Run tests with JaCoCo
+mvn clean test jacoco:report
+
+# View JaCoCo report
+open target/site/jacoco/index.html
+
+# Run SonarQube analysis (requires SonarQube server)
+mvn sonar:sonar
+```
+
+### Quality Gates
+
+The project maintains the following quality standards:
+- Minimum coverage requirement: 80%
+- Zero security hotspots
+- Zero code duplication tolerance: <3%
+- All new code must maintain or improve coverage metrics
+
 ## Contributing
 
 1. Fork the repository
