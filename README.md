@@ -1,8 +1,8 @@
 # SmartLogi API Documentation
-[![Quality Gate Status](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=alert_status&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
-[![Security Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_security_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
-[![Reliability Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_reliability_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
-[![Maintainability Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_maintainability_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=WissamDouskary_Smart-Delivery-v2&metric=alert_status)](https://sonarcloud.io/dashboard?id=WissamDouskary_Smart-Delivery-v2)
+![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=WissamDouskary_Smart-Delivery-v2&metric=security_rating)
+![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=WissamDouskary_Smart-Delivery-v2&metric=reliability_rating)
+![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=WissamDouskary_Smart-Delivery-v2&metric=sqale_rating)
 
 ## Overview
 
