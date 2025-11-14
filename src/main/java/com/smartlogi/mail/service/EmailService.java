@@ -40,7 +40,6 @@ public class EmailService {
                     "📦 Your Colis Has Been Successfully Created — [Tracking ID: " + colis.getId() + "]",
                     htmlBody);
         } catch (Exception e) {
-            e.printStackTrace();
             return "Error while sending creation email.";
         }
     }
@@ -63,7 +62,6 @@ public class EmailService {
                     "🚚 Your Colis Has Been Assigned to a Livreur — [Tracking ID: " + colis.getId() + "]",
                     htmlBody);
         } catch (Exception e) {
-            e.printStackTrace();
             return "Error while sending assignment email.";
         }
     }
@@ -83,7 +81,6 @@ public class EmailService {
                     "🔄 Colis Status Updated — [Tracking ID: " + colis.getId() + "]",
                     htmlBody);
         } catch (Exception e) {
-            e.printStackTrace();
             return "Error while sending status update email.";
         }
     }

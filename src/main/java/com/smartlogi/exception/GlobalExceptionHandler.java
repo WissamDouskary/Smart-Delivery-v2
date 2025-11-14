@@ -49,7 +49,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGenericException(Exception ex) {
         ApiResponse<String> apiResponse = new ApiResponse<>("Internal server error", null);
-        ex.printStackTrace();
         return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

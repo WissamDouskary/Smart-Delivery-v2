@@ -1,4 +1,8 @@
 # SmartLogi API Documentation
+[![Quality Gate Status](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=alert_status&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
+[![Security Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_security_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
+[![Reliability Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_reliability_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
+[![Maintainability Rating](http://127.0.0.1:9000/api/project_badges/measure?project=com.smartlogi%3AsmartLogi-v2&metric=software_quality_maintainability_rating&token=sqb_319c016f650f90fce5d83ffd68cc1f5f00b8613b)](http://127.0.0.1:9000/dashboard?id=com.smartlogi%3AsmartLogi-v2)
 
 ## Overview
 
