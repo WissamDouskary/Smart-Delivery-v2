@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.smartlogi</groupId>
     <artifactId>smartLogi-v2</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>smartLogi-v2</name>
     <description>smartLogi-v2</description>
