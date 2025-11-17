@@ -31,3 +31,7 @@ databaseChangeLog:
       file: db/changelog/016-change-changementDate-name.yaml
   - include:
       file: db/changelog/017-add-price-quantity-to-colis_products.yaml
+  - include:
+      file: db/changelog/018-add-password-users-table.yaml
+  - include:
+      file: db/changelog/019-create-gestionnaire-table.yaml
