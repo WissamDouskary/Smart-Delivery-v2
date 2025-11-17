@@ -21,6 +21,9 @@ public class Sender {
     private String telephone;
     private String adresse;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("sender-colis")
     private List<Colis> colisList = new ArrayList<>();
@@ -81,5 +84,13 @@ public class Sender {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
