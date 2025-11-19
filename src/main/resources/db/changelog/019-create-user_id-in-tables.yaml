@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 19
+      author: wissam
+      changes:
+        - addColumn:
+            tableName: livreurs
+            columns:
+              - column:
+                  name: user_id
+                  type: varchar(36)
+
+        - addColumn:
+            tableName: senders
+            columns:
+              - column:
+                  name: user_id
+                  type: varchar(36)
+
+
+        - addForeignKeyConstraint:
+            baseTableName: livreurs
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_livreurs_users
+
+        - addForeignKeyConstraint:
+            baseTableName: senders
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_senders_users
+
+        - addForeignKeyConstraint:
+            baseTableName: managers
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_managers_users
