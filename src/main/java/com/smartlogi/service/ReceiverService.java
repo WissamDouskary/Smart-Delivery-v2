@@ -13,8 +13,8 @@ import java.util.List;
 
 @Service
 public class ReceiverService {
-    private ReceiverRepository receiverRepository;
-    private ReceiverMapper receiverMapper;
+    private final ReceiverRepository receiverRepository;
+    private final ReceiverMapper receiverMapper;
 
     @Autowired
     public ReceiverService(ReceiverRepository receiverRepository, ReceiverMapper receiverMapper){

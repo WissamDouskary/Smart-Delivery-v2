@@ -1,21 +1,18 @@
 package com.smartlogi.service;
 
-import com.smartlogi.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.dto.responseDTO.ZoneResponseDTO;
 import com.smartlogi.exception.ResourceNotFoundException;
 import com.smartlogi.mapper.ZoneMapper;
-import com.smartlogi.model.Sender;
 import com.smartlogi.model.Zone;
 import com.smartlogi.repository.CityRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class CityService {
-    private CityRepository cityRepository;
-    private ZoneMapper zoneMapper;
+    private final CityRepository cityRepository;
+    private final ZoneMapper zoneMapper;
 
     public CityService(CityRepository cityRepository, ZoneMapper zoneMapper){
         this.cityRepository = cityRepository;

@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/receiver")
 @Tag(name = "Receivers Management", description = "Endpoints for managing Receivers")
 public class ReceiverController {
-    private ReceiverService receiverService;
+    private final ReceiverService receiverService;
 
     public ReceiverController(ReceiverService receiverService){
         this.receiverService = receiverService;

@@ -2,20 +2,21 @@ package com.smartlogi.controller;
 
 import com.smartlogi.dto.ApiResponse;
 import com.smartlogi.dto.requestsDTO.LivreurRequestDTO;
-import com.smartlogi.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.dto.responseDTO.LivreurResponseDTO;
-import com.smartlogi.model.Livreur;
 import com.smartlogi.service.LivreurService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/livreur")
 @Tag(name = "Livreur Management", description = "Endpoints for managing Livreurs")
 public class LivreurController {
-    private LivreurService livreurService;
+    private final LivreurService livreurService;
 
     public LivreurController(LivreurService livreurService){
         this.livreurService = livreurService;
