@@ -1,6 +1,7 @@
 package com.smartlogi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -24,9 +25,6 @@ public class Livreur {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "telephone", nullable = false)
     private String telephone;
 
@@ -40,6 +38,19 @@ public class Livreur {
     @OneToMany(mappedBy = "livreur", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference("livreur-colis")
     private List<Colis> colisList = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public List<Colis> getColisList() {
         return colisList;
@@ -95,14 +106,6 @@ public class Livreur {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {

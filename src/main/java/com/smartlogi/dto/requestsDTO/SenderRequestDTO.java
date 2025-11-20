@@ -19,6 +19,10 @@ public class SenderRequestDTO {
     @Email(message = "Format d'email invalide")
     private String email;
 
+    @NotNull(message = "Le mot de passe est obligatoire")
+    @NotBlank(message = "Le mot de passe ne peut être vide")
+    private String password;
+
     @NotBlank(message = "Le téléphone est obligatoire")
     @Size(min = 10, max = 15, message = "Le numéro de téléphone doit contenir entre 10 et 15 chiffres")
     private String telephone;
@@ -41,4 +45,11 @@ public class SenderRequestDTO {
 
     public String getAdresse() { return adresse; }
     public void setAdresse(String adresse) { this.adresse = adresse; }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

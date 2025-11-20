@@ -1,13 +1,10 @@
 package com.smartlogi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "senders")
@@ -21,12 +18,21 @@ public class Sender {
     private String telephone;
     private String adresse;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("sender-colis")
     private List<Colis> colisList = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Sender(){}
 
@@ -84,13 +90,5 @@ public class Sender {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

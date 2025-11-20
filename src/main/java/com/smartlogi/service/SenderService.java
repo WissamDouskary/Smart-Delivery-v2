@@ -15,8 +15,8 @@ import java.util.List;
 
 @Service
 public class SenderService {
-    private SenderRepository senderRepository;
-    private SenderMapper senderMapper;
+    private final SenderRepository senderRepository;
+    private final SenderMapper senderMapper;
 
     @Autowired
     public SenderService(SenderRepository senderRepository, SenderMapper senderMapper){

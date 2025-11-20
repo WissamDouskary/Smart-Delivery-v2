@@ -17,21 +17,10 @@ import java.util.List;
 @RequestMapping("/api/sender")
 @Tag(name = "Senders Management", description = "Endpoints for managing Senders")
 public class SenderController {
-    private SenderService senderService;
+    private final SenderService senderService;
 
     public SenderController(SenderService senderService) {
         this.senderService = senderService;
-    }
-
-    @PostMapping
-    @Operation(summary = "Save Sender", description = "Save sender informations")
-    public ResponseEntity<ApiResponse<SenderResponseDTO>> saveSender(@Valid @RequestBody SenderRequestDTO dto) {
-        SenderResponseDTO responseDTO = senderService.saveSender(dto);
-
-        ApiResponse<SenderResponseDTO> apiResponse =
-                new ApiResponse<>("Sender enregistré avec succès", responseDTO);
-
-        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/{id}")

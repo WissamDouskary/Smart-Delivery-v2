@@ -1,6 +1,7 @@
 package com.smartlogi.dto.requestsDTO;
 
 import com.smartlogi.model.Zone;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,6 +14,12 @@ public class LivreurRequestDTO {
 
     @NotNull(message = "La telephone ne peut pas être vide")
     private String telephone;
+
+    @Email
+    private String email;
+
+    @NotBlank(message = "le mot de pass ne peut pas étre vide")
+    private String password;
 
     @NotNull(message = "Le vehicle ne peut pas être vide")
     private String vehicle;
@@ -58,5 +65,21 @@ public class LivreurRequestDTO {
 
     public void setCity(Zone city) {
         this.city = city;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
