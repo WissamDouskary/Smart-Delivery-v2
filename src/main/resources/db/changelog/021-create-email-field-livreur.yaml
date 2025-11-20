@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 021-create-email-field-livreur
+      author: wissam
+      changes:
+        - addColumn:
+            tableName: livreurs
+            columns:
+              - column:
+                  name: email
+                  type: varchar(155)
+                  constraints:
+                    nullable: false
