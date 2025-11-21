@@ -1,5 +1,6 @@
 package com.smartlogi.security.service;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -19,7 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class JwtService {
 
-    private final String secretKey = "azertyuiopkikjuytfghnbvcxwsdfgytredfghbvcxqzeGFD";
+    Dotenv dotenv = Dotenv.load();
+    private String secretKey = dotenv.get("TOKEN_SECRET_KEY");
     private final long jwtExpiration = 86400000L;
 
     public String extractUsername(String token) {
