@@ -39,3 +39,5 @@ databaseChangeLog:
       file: db/changelog/019-create-user_id-in-tables.yaml
   - include:
       file: db/changelog/021-create-email-field-livreur.yaml
+  - include:
+      file: db/changelog/022-add-user_id-receiver.yaml
