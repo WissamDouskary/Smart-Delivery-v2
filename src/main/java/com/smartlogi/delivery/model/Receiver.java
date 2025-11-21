@@ -18,6 +18,10 @@ public class Receiver {
     private String telephone;
     private String adresse;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
     @JsonManagedReference("receiver-colis")
     private List<Colis> colisList = new ArrayList<>();
@@ -76,5 +80,13 @@ public class Receiver {
 
     public void setColis(List<Colis> colis) {
         this.colisList = colis;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

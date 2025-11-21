@@ -41,6 +41,17 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Sender sender;
 
+    @OneToOne(mappedBy = "user")
+    private Receiver receiver;
+
+    public Receiver getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(Receiver receiver) {
+        this.receiver = receiver;
+    }
+
     public Livreur getLivreur() {
         return livreur;
     }
