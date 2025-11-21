@@ -114,6 +114,15 @@ public class ColisService {
             senderEntity.setEmail(dto.getSender().getEmail());
             senderEntity.setTelephone(dto.getSender().getTelephone());
             senderEntity.setAdresse(dto.getSender().getAdresse());
+
+            User user = new User();
+            user.setEmail(dto.getSender().getEmail());
+            user.setPassword(SecurityConfig.passwordEncoder().encode("123456789"));
+            user.setRole(Role.Sender);
+
+            user.setSender(senderEntity);
+            senderEntity.setUser(user);
+
             senderEntity = senderRepository.save(senderEntity);
         }
 
