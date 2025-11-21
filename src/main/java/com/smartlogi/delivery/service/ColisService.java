@@ -24,6 +24,7 @@ import com.smartlogi.delivery.model.*;
 import com.smartlogi.delivery.repository.*;
 
 import com.smartlogi.security.config.SecurityConfig;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +50,7 @@ public class ColisService {
     private final EmailService emailService;
     private final ReceiverRepository receiverRepository;
     private final SenderRepository senderRepository;
+    Dotenv dotenv = Dotenv.load();
 
     @Autowired
     public ColisService(SenderRepository senderRepository,
@@ -95,7 +97,7 @@ public class ColisService {
 
             User user = new User();
             user.setEmail(dto.getReceiver().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode("123456789"));
+            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
             user.setRole(Role.Receiver);
 
             user.setReceiver(receiverEntity);
@@ -117,7 +119,7 @@ public class ColisService {
 
             User user = new User();
             user.setEmail(dto.getSender().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode("123456789"));
+            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
             user.setRole(Role.Sender);
 
             user.setSender(senderEntity);
