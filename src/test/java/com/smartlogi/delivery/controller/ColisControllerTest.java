@@ -116,7 +116,7 @@ class ColisControllerTest {
 
     @Test
     void findAllColisForClient_ShouldReturnList() throws Exception {
-        Mockito.when(colisService.findAllColisForClient("10")).thenReturn(List.of(colisResponse));
+        Mockito.when(colisService.findAllColisForClient()).thenReturn(List.of(colisResponse));
 
         mockMvc.perform(get("/api/colis/client/10"))
                 .andExpect(status().isOk())
@@ -126,7 +126,7 @@ class ColisControllerTest {
     @Test
     void findAllColisForReceiver_ShouldReturnList() throws Exception {
         ColisSummaryDTO summaryDTO = new ColisSummaryDTO();
-        Mockito.when(colisService.findAllColisForReciever("22")).thenReturn(List.of(summaryDTO));
+        Mockito.when(colisService.findAllColisForReciever()).thenReturn(List.of(summaryDTO));
 
         mockMvc.perform(get("/api/colis/receiver/22"))
                 .andExpect(status().isOk())
@@ -135,7 +135,7 @@ class ColisControllerTest {
 
     @Test
     void findAllColisByLivreur_ShouldReturnList() throws Exception {
-        Mockito.when(colisService.findAllColisForLivreurs("55")).thenReturn(List.of(colisResponse));
+        Mockito.when(colisService.findAllColisForLivreurs()).thenReturn(List.of(colisResponse));
 
         mockMvc.perform(get("/api/colis/livreur/55"))
                 .andExpect(status().isOk())

@@ -65,23 +65,20 @@ public class ColisController {
 
     @Operation(summary = "Get colis for a client", description = "Retrieve all colis linked to a specific client")
     @GetMapping("/client/{id}")
-    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll(
-            @PathVariable("id") String senderId) {
-        return ResponseEntity.ok(new ApiResponse<>("Colis du client récupérés", colisService.findAllColisForClient(senderId)));
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAll() {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du client récupérés", colisService.findAllColisForClient()));
     }
 
     @Operation(summary = "Get colis for a receiver", description = "Retrieve all colis sent to a specific receiver")
     @GetMapping("/receiver/{id}")
-    public ResponseEntity<ApiResponse<List<ColisSummaryDTO>>> findAllColisForReceiver(
-            @PathVariable("id") String receiver_id) {
-        return ResponseEntity.ok(new ApiResponse<>("Colis du destinataire récupérés", colisService.findAllColisForReciever(receiver_id)));
+    public ResponseEntity<ApiResponse<List<ColisSummaryDTO>>> findAllColisForReceiver() {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du destinataire récupérés", colisService.findAllColisForReciever()));
     }
 
     @Operation(summary = "Get colis for a livreur", description = "Retrieve all colis assigned to a specific livreur")
-    @GetMapping("/livreur/{id}")
-    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColisByLivreur_Id(
-            @PathVariable("id") String livreur_id) {
-        return ResponseEntity.ok(new ApiResponse<>("Colis du livreur récupérés", colisService.findAllColisForLivreurs(livreur_id)));
+    @GetMapping("/livreur")
+    public ResponseEntity<ApiResponse<List<ColisResponseDTO>>> findAllColisByLivreur_Id() {
+        return ResponseEntity.ok(new ApiResponse<>("Colis du livreur récupérés", colisService.findAllColisForLivreurs()));
     }
 
     @Operation(summary = "Update colis status", description = "Change the status of a colis assigned to a livreur")

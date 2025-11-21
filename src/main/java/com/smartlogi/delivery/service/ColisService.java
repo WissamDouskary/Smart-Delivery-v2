@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,7 @@ public class ColisService {
     private final EmailService emailService;
     private final ReceiverRepository receiverRepository;
     private final SenderRepository senderRepository;
+    private final UserRepository userRepository;
     Dotenv dotenv = Dotenv.load();
 
     @Autowired
@@ -64,7 +66,8 @@ public class ColisService {
                         CityService cityService,
                         ColisMapper colisMapper,
                         ReceiverService receiverService,
-                        SenderService senderService
+                        SenderService senderService,
+                        UserRepository userRepository
     ){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
@@ -78,6 +81,7 @@ public class ColisService {
         this.emailService = emailService;
         this.receiverRepository = receiverRepository;
         this.senderRepository = senderRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -106,7 +110,24 @@ public class ColisService {
             receiverEntity = receiverRepository.save(receiverEntity);
         }
 
-        Sender senderEntity;
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User authUser = userRepository.findUserByEmail(email);
+
+        boolean isSender = authUser.getRole() == Role.Sender;
+        boolean isManager = authUser.getRole() == Role.Manager;
+
+        Sender senderEntity = null;
+
+        if (isSender) {
+            if (authUser.getSender() == null) {
+                throw new OperationNotAllowedException("Sender account incomplete.");
+            }
+
+            senderEntity = authUser.getSender();
+        }
+
+        else if (isManager) {
+
         if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
             senderEntity = senderService.findEntityById(dto.getSender().getId());
         } else {
@@ -126,6 +147,11 @@ public class ColisService {
             senderEntity.setUser(user);
 
             senderEntity = senderRepository.save(senderEntity);
+        }
+
+        }
+        else {
+            throw new OperationNotAllowedException("Only Sender or Manager can assign sender info");
         }
 
         Colis colis = colisMapper.toEntity(dto);
@@ -379,16 +405,34 @@ public class ColisService {
         return colisMapper.toDTO(saved);
     }
 
-    public List<ColisResponseDTO> findAllColisForClient(String sender_id){
-        List<Colis> colisList = colisRepository.findColisBySender_Id(sender_id);
+    public List<ColisResponseDTO> findAllColisForClient(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findUserByEmail(email);
+        Sender sender = user.getSender();
+
+        if (sender == null) {
+            throw new OperationNotAllowedException("You are not a livreur");
+        }
+
+        List<Colis> colisList = colisRepository.findColisBySender_Id(sender.getId());
         if(colisList.isEmpty()){
             throw new ResourceNotFoundException("Aucun Colis pour ce client");
         }
         return colisMapper.toResponseDTOList(colisList);
     }
 
-    public List<ColisSummaryDTO> findAllColisForReciever(String reciever_id){
-        List<Colis> colisList = colisRepository.findColisByReceiver_Id(reciever_id);
+    public List<ColisSummaryDTO> findAllColisForReciever(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findUserByEmail(email);
+
+        Receiver receiver = user.getReceiver();
+
+        if (receiver == null) {
+            throw new OperationNotAllowedException("You are not a livreur");
+        }
+
+        List<Colis> colisList = colisRepository.findColisByReceiver_Id(receiver.getId());
         if (colisList.isEmpty()) {
             throw new ResourceNotFoundException("No colis found for this receiver");
         }
@@ -403,10 +447,22 @@ public class ColisService {
         return colisResponseDTOList;
     }
 
-    public List<ColisResponseDTO> findAllColisForLivreurs(String livreur_id){
-        List<Colis> colisList = colisRepository.findColisByLivreur_Id(livreur_id);
+    public List<ColisResponseDTO> findAllColisForLivreurs(){
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User user = userRepository.findUserByEmail(email);
+
+        Livreur livreur = user.getLivreur();
+        if (livreur == null) {
+            throw new OperationNotAllowedException("You are not a livreur");
+        }
+
+        List<Colis> colisList = colisRepository.findColisByLivreur_Id(livreur.getId());
         if(colisList.isEmpty()){
-            throw new ResourceNotFoundException("Aucun Colis pour livreur avec id: "+livreur_id);
+            throw new ResourceNotFoundException("Aucun Colis pour livreur avec id: "+livreur.getId());
         }
         return colisMapper.toResponseDTOList(colisList);
     }

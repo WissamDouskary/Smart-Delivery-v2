@@ -24,7 +24,6 @@ public class ColisRequestDTO {
     @NotNull(message = "Le receiver ne peut pas être vide")
     private Receiver receiver;
 
-    @NotNull(message = "Le sender ne peut pas être vide")
     private Sender sender;
 
     @NotNull(message = "Le Produit ne peut pas être vide")
