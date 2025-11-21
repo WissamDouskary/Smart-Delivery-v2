@@ -2,7 +2,9 @@ package com.smartlogi.delivery.service;
 
 import com.smartlogi.delivery.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.delivery.dto.requestsDTO.ColisRequestDTO;
+import com.smartlogi.delivery.dto.requestsDTO.ReceiverRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.*;
+import com.smartlogi.delivery.enums.Role;
 import com.smartlogi.delivery.mapper.ColisMapper;
 import com.smartlogi.delivery.mapper.SenderMapper;
 import com.smartlogi.delivery.mapper.ZoneMapper;
@@ -20,6 +22,8 @@ import com.smartlogi.delivery.mail.service.EmailService;
 import com.smartlogi.delivery.mapper.*;
 import com.smartlogi.delivery.model.*;
 import com.smartlogi.delivery.repository.*;
+
+import com.smartlogi.security.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -88,6 +92,15 @@ public class ColisService {
             receiverEntity.setEmail(dto.getReceiver().getEmail());
             receiverEntity.setTelephone(dto.getReceiver().getTelephone());
             receiverEntity.setAdresse(dto.getReceiver().getAdresse());
+
+            User user = new User();
+            user.setEmail(dto.getReceiver().getEmail());
+            user.setPassword(SecurityConfig.passwordEncoder().encode("123456789"));
+            user.setRole(Role.Receiver);
+
+            user.setReceiver(receiverEntity);
+            receiverEntity.setUser(user);
+
             receiverEntity = receiverRepository.save(receiverEntity);
         }
 
