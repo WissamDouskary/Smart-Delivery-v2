@@ -10,6 +10,7 @@ public class SmartLogiV2Application {
         Dotenv dotenv = Dotenv.load();
         System.setProperty("SMTP-USERNAME", dotenv.get("SMTP-USERNAME"));
         System.setProperty("SMTP-PASSWORD", dotenv.get("SMTP-PASSWORD"));
+        System.setProperty("TOKEN_SECRET_KEY", dotenv.get("TOKEN_SECRET_KEY"));
         SpringApplication.run(SmartLogiV2Application.class, args);
     }
 }
