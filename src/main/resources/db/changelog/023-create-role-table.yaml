@@ -1,0 +1,200 @@
+databaseChangeLog:
+  - property:
+      name: uuid_function
+      value: UUID()
+      dbms: mysql, mariadb, h2
+  - property:
+      name: uuid_function
+      value: gen_random_uuid()
+      dbms: postgresql
+
+  - changeSet:
+      id: 1-create-roles-table-uuid
+      author: smartlogi
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: Manager }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: Sender }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: Livreur }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: Receiver }
+
+  - changeSet:
+      id: 2-create-permissions-table-uuid
+      author: smartlogi
+      changes:
+        - createTable:
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+  - changeSet:
+      id: 3-create-roles-permissions-table-uuid
+      author: smartlogi
+      changes:
+        - createTable:
+            tableName: roles_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_roles_permissions_role
+                    references: roles(id)
+              - column:
+                  name: permission_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_roles_permissions_permission
+                    references: permissions(id)
+        - addPrimaryKey:
+            tableName: roles_permissions
+            columnNames: role_id, permission_id
+
+  - changeSet:
+      id: 4-insert-permissions-uuid
+      author: smartlogi
+      changes:
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_CREATE_COLIS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_READ_ALL_COLIS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_READ_OWN_COLIS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_UPDATE_COLIS_FULL }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_UPDATE_COLIS_STATUS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_DELETE_COLIS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_ASSIGN_LIVREUR }
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_MANAGE_LIVREURS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_MANAGE_ZONES }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_VIEW_STATS }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_MANAGE_ROLES }
+
+  - changeSet:
+      id: 5-map-roles-permissions
+      author: smartlogi
+      changes:
+        - sql:
+            sql: |
+              -- 1. Manager gets ALL Permissions (except specific client restrictions if any, but usually all)
+              INSERT INTO roles_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p
+              WHERE r.name = 'Manager';
+
+              -- 2. Sender (Client) Permissions
+              INSERT INTO roles_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p
+              WHERE r.name = 'Sender' 
+              AND p.name IN ('CAN_CREATE_COLIS', 'CAN_READ_OWN_COLIS');
+
+              -- 3. Livreur Permissions
+              INSERT INTO roles_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p
+              WHERE r.name = 'Livreur' 
+              AND p.name IN ('CAN_UPDATE_COLIS_STATUS', 'CAN_READ_OWN_COLIS');
+
+  - changeSet:
+      id: 6-migrate-users-role-uuid
+      author: smartlogi
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: role_id
+                  type: VARCHAR(36)
+
+        - dropColumn:
+            tableName: users
+            columnName: role
+
+        - addForeignKeyConstraint:
+            baseTableName: users
+            baseColumnNames: role_id
+            constraintName: fk_users_role
+            referencedTableName: roles
+            referencedColumnNames: id
