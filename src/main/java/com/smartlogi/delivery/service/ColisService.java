@@ -2,9 +2,8 @@ package com.smartlogi.delivery.service;
 
 import com.smartlogi.delivery.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.delivery.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.delivery.dto.requestsDTO.ReceiverRequestDTO;
+import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.dto.responseDTO.*;
-import com.smartlogi.delivery.enums.Role;
 import com.smartlogi.delivery.mapper.ColisMapper;
 import com.smartlogi.delivery.mapper.SenderMapper;
 import com.smartlogi.delivery.mapper.ZoneMapper;
@@ -52,6 +51,8 @@ public class ColisService {
     private final ReceiverRepository receiverRepository;
     private final SenderRepository senderRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+
     Dotenv dotenv = Dotenv.load();
 
     @Autowired
@@ -67,7 +68,8 @@ public class ColisService {
                         ColisMapper colisMapper,
                         ReceiverService receiverService,
                         SenderService senderService,
-                        UserRepository userRepository
+                        UserRepository userRepository,
+                        RoleRepository roleRepository
     ){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
@@ -82,6 +84,7 @@ public class ColisService {
         this.receiverRepository = receiverRepository;
         this.senderRepository = senderRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Transactional
@@ -102,7 +105,12 @@ public class ColisService {
             User user = new User();
             user.setEmail(dto.getReceiver().getEmail());
             user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
-            user.setRole(Role.Receiver);
+
+            Role receiverRole = roleRepository.findByName("Receiver")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role 'Receiver' not found"));
+
+            user.setRole(receiverRole.getId());
+            user.setRoleEntity(receiverRole);
 
             user.setReceiver(receiverEntity);
             receiverEntity.setUser(user);
@@ -113,8 +121,9 @@ public class ColisService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User authUser = userRepository.findUserByEmail(email);
 
-        boolean isSender = authUser.getRole() == Role.Sender;
-        boolean isManager = authUser.getRole() == Role.Manager;
+        String userRoleName = authUser.getRoleEntity().getName();
+        boolean isSender = "Sender".equals(userRoleName);
+        boolean isManager = "Manager".equals(userRoleName);
 
         Sender senderEntity = null;
 
@@ -122,36 +131,37 @@ public class ColisService {
             if (authUser.getSender() == null) {
                 throw new OperationNotAllowedException("Sender account incomplete.");
             }
-
             senderEntity = authUser.getSender();
         }
-
         else if (isManager) {
+            if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
+                senderEntity = senderService.findEntityById(dto.getSender().getId());
+            } else {
+                senderEntity = new Sender();
+                senderEntity.setNom(dto.getSender().getNom());
+                senderEntity.setPrenom(dto.getSender().getPrenom());
+                senderEntity.setEmail(dto.getSender().getEmail());
+                senderEntity.setTelephone(dto.getSender().getTelephone());
+                senderEntity.setAdresse(dto.getSender().getAdresse());
 
-        if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
-            senderEntity = senderService.findEntityById(dto.getSender().getId());
-        } else {
-            senderEntity = new Sender();
-            senderEntity.setNom(dto.getSender().getNom());
-            senderEntity.setPrenom(dto.getSender().getPrenom());
-            senderEntity.setEmail(dto.getSender().getEmail());
-            senderEntity.setTelephone(dto.getSender().getTelephone());
-            senderEntity.setAdresse(dto.getSender().getAdresse());
+                User user = new User();
+                user.setEmail(dto.getSender().getEmail());
+                user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
 
-            User user = new User();
-            user.setEmail(dto.getSender().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
-            user.setRole(Role.Sender);
+                Role senderRole = roleRepository.findByName("Sender")
+                        .orElseThrow(() -> new ResourceNotFoundException("Role 'Sender' not found"));
 
-            user.setSender(senderEntity);
-            senderEntity.setUser(user);
+                user.setRole(senderRole.getId());
+                user.setRoleEntity(senderRole);
 
-            senderEntity = senderRepository.save(senderEntity);
-        }
+                user.setSender(senderEntity);
+                senderEntity.setUser(user);
 
+                senderEntity = senderRepository.save(senderEntity);
+            }
         }
         else {
-            throw new OperationNotAllowedException("Only Sender or Manager can assign sender info");
+            throw new OperationNotAllowedException("Only Sender or Manager can create a Colis");
         }
 
         Colis colis = colisMapper.toEntity(dto);
@@ -164,36 +174,36 @@ public class ColisService {
         colis.setPoids(0.0);
 
         double totalPoids = 0;
-        double totalPrice = 0;
 
         List<ColisProduct> colisProducts = new ArrayList<>();
-        for (ColisProductsRequestDTO prodDto : dto.getProducts()) {
-            Products product;
+        if (dto.getProducts() != null) {
+            for (ColisProductsRequestDTO prodDto : dto.getProducts()) {
+                Products product;
 
-            if (prodDto.getId() != null && !prodDto.getId().isEmpty()) {
-                product = productRepository.findById(prodDto.getId())
-                        .orElseThrow(() -> new RuntimeException("Product not found: " + prodDto.getId()));
-            } else {
-                product = new Products();
-                product.setNom(prodDto.getNom());
-                product.setCategory(prodDto.getCategory());
-                product.setPoids(prodDto.getPoids());
-                product.setPrice(prodDto.getPrice());
-                productRepository.save(product);
+                if (prodDto.getId() != null && !prodDto.getId().isEmpty()) {
+                    product = productRepository.findById(prodDto.getId())
+                            .orElseThrow(() -> new RuntimeException("Product not found: " + prodDto.getId()));
+                } else {
+                    product = new Products();
+                    product.setNom(prodDto.getNom());
+                    product.setCategory(prodDto.getCategory());
+                    product.setPoids(prodDto.getPoids());
+                    product.setPrice(prodDto.getPrice());
+                    productRepository.save(product);
+                }
+
+                ColisProduct colisProduct = new ColisProduct();
+                colisProduct.setId(new ColisProductId(colis.getId(), product.getId()));
+                colisProduct.setColis(colis);
+                colisProduct.setProduct(product);
+                colisProduct.setQuantity((int) prodDto.getQuantity());
+                colisProduct.setPrix(product.getPrice() * prodDto.getQuantity());
+                colisProduct.setDateAjout(Instant.now());
+
+                colisProducts.add(colisProduct);
+
+                totalPoids += product.getPoids() * prodDto.getQuantity();
             }
-
-            ColisProduct colisProduct = new ColisProduct();
-            colisProduct.setId(new ColisProductId(colis.getId(), product.getId()));
-            colisProduct.setColis(colis);
-            colisProduct.setProduct(product);
-            colisProduct.setQuantity((int) prodDto.getQuantity());
-            colisProduct.setPrix(product.getPrice() * prodDto.getQuantity());
-            colisProduct.setDateAjout(Instant.now());
-
-            colisProducts.add(colisProduct);
-
-            totalPoids += product.getPoids() * prodDto.getQuantity();
-            totalPrice += product.getPrice() * prodDto.getQuantity();
         }
 
         colis.setPoids(totalPoids);
@@ -207,7 +217,6 @@ public class ColisService {
         colis.getHistoriqueLivraisonList().add(historique);
 
         colis = colisRepository.save(colis);
-
         emailService.sendColisCreatedEmail(colis);
 
         return colisMapper.toDTO(colis);

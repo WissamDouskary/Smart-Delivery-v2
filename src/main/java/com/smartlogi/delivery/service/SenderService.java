@@ -2,13 +2,14 @@ package com.smartlogi.delivery.service;
 
 import com.smartlogi.delivery.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
-import com.smartlogi.delivery.enums.Role;
 import com.smartlogi.delivery.exception.ResourceNotFoundException;
 import com.smartlogi.delivery.mapper.SenderMapper;
+import com.smartlogi.delivery.model.Role;
 import com.smartlogi.delivery.model.Sender;
 import com.smartlogi.delivery.model.User;
+import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.repository.SenderRepository;
-import com.smartlogi.security.config.SecurityConfig;
+import com.smartlogi.delivery.repository.UserRepository; // Import correct repo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,15 +20,21 @@ import java.util.List;
 public class SenderService {
     private final SenderRepository senderRepository;
     private final SenderMapper senderMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private SenderRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SenderService(SenderRepository senderRepository, SenderMapper senderMapper){
+    public SenderService(SenderRepository senderRepository,
+                         SenderMapper senderMapper,
+                         UserRepository userRepository,
+                         RoleRepository roleRepository,
+                         PasswordEncoder passwordEncoder){
         this.senderRepository = senderRepository;
         this.senderMapper = senderMapper;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public SenderResponseDTO saveSender(SenderRequestDTO dto){
@@ -35,12 +42,16 @@ public class SenderService {
             throw new IllegalArgumentException("Un compte avec cet email existe déjà.");
         }
 
+        Role role = roleRepository.findByName("Sender")
+                .orElseThrow(() -> new ResourceNotFoundException("Role 'Sender' not found in database"));
+
         Sender s = senderMapper.toEntity(dto);
 
         User user = new User();
         user.setEmail(s.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(Role.Sender);
+        user.setRole(role.getId());
+        user.setRoleEntity(role);
 
         s.setUser(user);
         user.setSender(s);
