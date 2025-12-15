@@ -50,7 +50,6 @@ public class SenderService {
         User user = new User();
         user.setEmail(s.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(role.getId());
         user.setRoleEntity(role);
 
         s.setUser(user);

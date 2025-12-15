@@ -109,7 +109,6 @@ public class ColisService {
             Role receiverRole = roleRepository.findByName("Receiver")
                     .orElseThrow(() -> new ResourceNotFoundException("Role 'Receiver' not found"));
 
-            user.setRole(receiverRole.getId());
             user.setRoleEntity(receiverRole);
 
             user.setReceiver(receiverEntity);
@@ -151,7 +150,6 @@ public class ColisService {
                 Role senderRole = roleRepository.findByName("Sender")
                         .orElseThrow(() -> new ResourceNotFoundException("Role 'Sender' not found"));
 
-                user.setRole(senderRole.getId());
                 user.setRoleEntity(senderRole);
 
                 user.setSender(senderEntity);

@@ -60,7 +60,6 @@ public class LivreurService {
         user.setEmail(dto.getEmail());
         user.setPassword(SecurityConfig.passwordEncoder().encode(dto.getPassword()));
 
-        user.setRole(role.getId());
         user.setRoleEntity(role);
 
         livreur.setUser(user);
