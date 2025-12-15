@@ -7,6 +7,7 @@ import com.smartlogi.delivery.service.SenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class SenderController {
 
     @Operation(summary = "Get All Senders")
     @GetMapping
+    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
     public ResponseEntity<ApiResponse<List<SenderResponseDTO>>> findAll(){
         return ResponseEntity.ok(new ApiResponse<>("Sender donner avec success", senderService.findAll()));
     }
