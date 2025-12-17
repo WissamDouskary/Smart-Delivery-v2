@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sender")
+@PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
 @Tag(name = "Senders Management", description = "Endpoints for managing Senders")
 public class SenderController {
     private final SenderService senderService;
@@ -42,7 +43,6 @@ public class SenderController {
 
     @Operation(summary = "Get All Senders")
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
     public ResponseEntity<ApiResponse<List<SenderResponseDTO>>> findAll(){
         return ResponseEntity.ok(new ApiResponse<>("Sender donner avec success", senderService.findAll()));
     }

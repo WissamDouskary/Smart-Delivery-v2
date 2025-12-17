@@ -7,6 +7,7 @@ import com.smartlogi.delivery.service.LivreurService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ public class LivreurController {
 
     @PostMapping
     @Operation(summary = "Create a new Livreur", description = "Add a new Livreur with details")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_LIVREURS')")
     public ResponseEntity<ApiResponse<LivreurResponseDTO>> saveLivreur(@RequestBody LivreurRequestDTO dto){
         LivreurResponseDTO l = livreurService.saveLivreur(dto);
 

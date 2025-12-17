@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/receiver")
 @Tag(name = "Receivers Management", description = "Endpoints for managing Receivers")
+@PreAuthorize("hasRole('ROLE_Manager')")
 public class ReceiverController {
     private final ReceiverService receiverService;
 
