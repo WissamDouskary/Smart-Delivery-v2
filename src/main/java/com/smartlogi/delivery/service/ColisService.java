@@ -23,6 +23,7 @@ import com.smartlogi.delivery.model.*;
 import com.smartlogi.delivery.repository.*;
 
 import com.smartlogi.security.config.SecurityConfig;
+import com.smartlogi.security.helper.AuthenticatedUserHelper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,7 @@ public class ColisService {
     private final SenderRepository senderRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final AuthenticatedUserHelper authenticatedUserHelper;
 
     Dotenv dotenv = Dotenv.load();
 
@@ -69,7 +71,8 @@ public class ColisService {
                         ReceiverService receiverService,
                         SenderService senderService,
                         UserRepository userRepository,
-                        RoleRepository roleRepository
+                        RoleRepository roleRepository,
+                        AuthenticatedUserHelper authenticatedUserHelper
     ){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
@@ -85,6 +88,7 @@ public class ColisService {
         this.senderRepository = senderRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.authenticatedUserHelper = authenticatedUserHelper;
     }
 
     @Transactional
@@ -117,22 +121,17 @@ public class ColisService {
             receiverEntity = receiverRepository.save(receiverEntity);
         }
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User authUser = userRepository.findUserByEmail(email);
-
-        String userRoleName = authUser.getRoleEntity().getName();
-        boolean isSender = "Sender".equals(userRoleName);
-        boolean isManager = "Manager".equals(userRoleName);
+        User authUser = authenticatedUserHelper.getAuthenticatedUser();
 
         Sender senderEntity = null;
 
-        if (isSender) {
+        if (authenticatedUserHelper.isSender()) {
             if (authUser.getSender() == null) {
                 throw new OperationNotAllowedException("Sender account incomplete.");
             }
             senderEntity = authUser.getSender();
         }
-        else if (isManager) {
+        else if (authenticatedUserHelper.isManager()) {
             if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
                 senderEntity = senderService.findEntityById(dto.getSender().getId());
             } else {
@@ -221,8 +220,19 @@ public class ColisService {
     }
 
     public ColisResponseDTO findColisById(String colis_id){
-        Colis colis = colisRepository.findById(colis_id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
+        Colis colis = null;
+
+        if(authenticatedUserHelper.isSender()){
+            colis = colisRepository.findColisByIdAndSender_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce sender ou avec id : "+colis_id));
+        }else if (authenticatedUserHelper.isLivreur()){
+            colis = colisRepository.findColisByIdAndLivreur_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce livreur ou avec id: "+colis_id));
+        }else{
+            colis = colisRepository.findById(colis_id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id :" + colis_id));
+        }
+
         return colisMapper.toDTO(colis);
     }
 
@@ -413,8 +423,8 @@ public class ColisService {
     }
 
     public List<ColisResponseDTO> findAllColisForClient(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
+
         Sender sender = user.getSender();
 
         if (sender == null) {
@@ -429,9 +439,7 @@ public class ColisService {
     }
 
     public List<ColisSummaryDTO> findAllColisForReciever(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
 
         Receiver receiver = user.getReceiver();
 
@@ -455,14 +463,10 @@ public class ColisService {
     }
 
     public List<ColisResponseDTO> findAllColisForLivreurs(){
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
 
         Livreur livreur = user.getLivreur();
+
         if (livreur == null) {
             throw new OperationNotAllowedException("You are not a livreur");
         }
