@@ -34,4 +34,8 @@ public class AuthenticatedUserHelper {
     public boolean isLivreur(){
         return "Livreur".equals(getAuthenticatedUser().getRoleName());
     }
+
+    public String getAuthUserId(){
+        return getAuthenticatedUser().getId();
+    }
 }
