@@ -20,7 +20,7 @@ public class Permission {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    @ManyToMany(mappedBy = "permissions")
+    @ManyToMany(mappedBy = "permissions", cascade = CascadeType.PERSIST)
     private Set<Role> roles = new HashSet<>();
 
     public Permission() {}
