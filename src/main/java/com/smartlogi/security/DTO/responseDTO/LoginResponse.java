@@ -1,4 +1,4 @@
-package com.smartlogi.security.DTO;
+package com.smartlogi.security.DTO.responseDTO;
 
 public class LoginResponse {
     private String token;
