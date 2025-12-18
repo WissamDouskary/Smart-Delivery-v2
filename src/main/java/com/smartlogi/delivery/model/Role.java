@@ -1,5 +1,6 @@
 package com.smartlogi.delivery.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,7 +25,7 @@ public class Role {
     @OneToMany(mappedBy = "roleEntity")
     private Set<User> users = new LinkedHashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "roles_permissions",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
