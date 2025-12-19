@@ -1,4 +1,4 @@
-package com.smartlogi.security.DTO;
+package com.smartlogi.security.DTO.requestDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

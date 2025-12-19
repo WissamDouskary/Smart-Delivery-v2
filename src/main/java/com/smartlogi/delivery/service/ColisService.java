@@ -2,9 +2,8 @@ package com.smartlogi.delivery.service;
 
 import com.smartlogi.delivery.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.delivery.dto.requestsDTO.ColisRequestDTO;
-import com.smartlogi.delivery.dto.requestsDTO.ReceiverRequestDTO;
+import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.dto.responseDTO.*;
-import com.smartlogi.delivery.enums.Role;
 import com.smartlogi.delivery.mapper.ColisMapper;
 import com.smartlogi.delivery.mapper.SenderMapper;
 import com.smartlogi.delivery.mapper.ZoneMapper;
@@ -24,12 +23,12 @@ import com.smartlogi.delivery.model.*;
 import com.smartlogi.delivery.repository.*;
 
 import com.smartlogi.security.config.SecurityConfig;
-import io.github.cdimascio.dotenv.Dotenv;
+import com.smartlogi.security.helper.AuthenticatedUserHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +51,11 @@ public class ColisService {
     private final ReceiverRepository receiverRepository;
     private final SenderRepository senderRepository;
     private final UserRepository userRepository;
-    Dotenv dotenv = Dotenv.load();
+    private final RoleRepository roleRepository;
+    private final AuthenticatedUserHelper authenticatedUserHelper;
+
+    @Value("${init.password}")
+    private String initPassword;
 
     @Autowired
     public ColisService(SenderRepository senderRepository,
@@ -67,7 +70,9 @@ public class ColisService {
                         ColisMapper colisMapper,
                         ReceiverService receiverService,
                         SenderService senderService,
-                        UserRepository userRepository
+                        UserRepository userRepository,
+                        RoleRepository roleRepository,
+                        AuthenticatedUserHelper authenticatedUserHelper
     ){
         this.colisRepository = colisRepository;
         this.cityService = cityService;
@@ -82,6 +87,8 @@ public class ColisService {
         this.receiverRepository = receiverRepository;
         this.senderRepository = senderRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.authenticatedUserHelper = authenticatedUserHelper;
     }
 
     @Transactional
@@ -101,8 +108,12 @@ public class ColisService {
 
             User user = new User();
             user.setEmail(dto.getReceiver().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
-            user.setRole(Role.Receiver);
+            user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
+
+            Role receiverRole = roleRepository.findByName("Receiver")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role 'Receiver' not found"));
+
+            user.setRoleEntity(receiverRole);
 
             user.setReceiver(receiverEntity);
             receiverEntity.setUser(user);
@@ -110,48 +121,44 @@ public class ColisService {
             receiverEntity = receiverRepository.save(receiverEntity);
         }
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User authUser = userRepository.findUserByEmail(email);
-
-        boolean isSender = authUser.getRole() == Role.Sender;
-        boolean isManager = authUser.getRole() == Role.Manager;
+        User authUser = authenticatedUserHelper.getAuthenticatedUser();
 
         Sender senderEntity = null;
 
-        if (isSender) {
+        if (authenticatedUserHelper.isSender()) {
             if (authUser.getSender() == null) {
                 throw new OperationNotAllowedException("Sender account incomplete.");
             }
-
             senderEntity = authUser.getSender();
         }
+        else if (authenticatedUserHelper.isManager()) {
+            if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
+                senderEntity = senderService.findEntityById(dto.getSender().getId());
+            } else {
+                senderEntity = new Sender();
+                senderEntity.setNom(dto.getSender().getNom());
+                senderEntity.setPrenom(dto.getSender().getPrenom());
+                senderEntity.setEmail(dto.getSender().getEmail());
+                senderEntity.setTelephone(dto.getSender().getTelephone());
+                senderEntity.setAdresse(dto.getSender().getAdresse());
 
-        else if (isManager) {
+                User user = new User();
+                user.setEmail(dto.getSender().getEmail());
+                user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
 
-        if (dto.getSender().getId() != null && !dto.getSender().getId().isEmpty()) {
-            senderEntity = senderService.findEntityById(dto.getSender().getId());
-        } else {
-            senderEntity = new Sender();
-            senderEntity.setNom(dto.getSender().getNom());
-            senderEntity.setPrenom(dto.getSender().getPrenom());
-            senderEntity.setEmail(dto.getSender().getEmail());
-            senderEntity.setTelephone(dto.getSender().getTelephone());
-            senderEntity.setAdresse(dto.getSender().getAdresse());
+                Role senderRole = roleRepository.findByName("Sender")
+                        .orElseThrow(() -> new ResourceNotFoundException("Role 'Sender' not found"));
 
-            User user = new User();
-            user.setEmail(dto.getSender().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
-            user.setRole(Role.Sender);
+                user.setRoleEntity(senderRole);
 
-            user.setSender(senderEntity);
-            senderEntity.setUser(user);
+                user.setSender(senderEntity);
+                senderEntity.setUser(user);
 
-            senderEntity = senderRepository.save(senderEntity);
-        }
-
+                senderEntity = senderRepository.save(senderEntity);
+            }
         }
         else {
-            throw new OperationNotAllowedException("Only Sender or Manager can assign sender info");
+            throw new OperationNotAllowedException("Only Sender or Manager can create a Colis");
         }
 
         Colis colis = colisMapper.toEntity(dto);
@@ -164,36 +171,36 @@ public class ColisService {
         colis.setPoids(0.0);
 
         double totalPoids = 0;
-        double totalPrice = 0;
 
         List<ColisProduct> colisProducts = new ArrayList<>();
-        for (ColisProductsRequestDTO prodDto : dto.getProducts()) {
-            Products product;
+        if (dto.getProducts() != null) {
+            for (ColisProductsRequestDTO prodDto : dto.getProducts()) {
+                Products product;
 
-            if (prodDto.getId() != null && !prodDto.getId().isEmpty()) {
-                product = productRepository.findById(prodDto.getId())
-                        .orElseThrow(() -> new RuntimeException("Product not found: " + prodDto.getId()));
-            } else {
-                product = new Products();
-                product.setNom(prodDto.getNom());
-                product.setCategory(prodDto.getCategory());
-                product.setPoids(prodDto.getPoids());
-                product.setPrice(prodDto.getPrice());
-                productRepository.save(product);
+                if (prodDto.getId() != null && !prodDto.getId().isEmpty()) {
+                    product = productRepository.findById(prodDto.getId())
+                            .orElseThrow(() -> new RuntimeException("Product not found: " + prodDto.getId()));
+                } else {
+                    product = new Products();
+                    product.setNom(prodDto.getNom());
+                    product.setCategory(prodDto.getCategory());
+                    product.setPoids(prodDto.getPoids());
+                    product.setPrice(prodDto.getPrice());
+                    productRepository.save(product);
+                }
+
+                ColisProduct colisProduct = new ColisProduct();
+                colisProduct.setId(new ColisProductId(colis.getId(), product.getId()));
+                colisProduct.setColis(colis);
+                colisProduct.setProduct(product);
+                colisProduct.setQuantity((int) prodDto.getQuantity());
+                colisProduct.setPrix(product.getPrice() * prodDto.getQuantity());
+                colisProduct.setDateAjout(Instant.now());
+
+                colisProducts.add(colisProduct);
+
+                totalPoids += product.getPoids() * prodDto.getQuantity();
             }
-
-            ColisProduct colisProduct = new ColisProduct();
-            colisProduct.setId(new ColisProductId(colis.getId(), product.getId()));
-            colisProduct.setColis(colis);
-            colisProduct.setProduct(product);
-            colisProduct.setQuantity((int) prodDto.getQuantity());
-            colisProduct.setPrix(product.getPrice() * prodDto.getQuantity());
-            colisProduct.setDateAjout(Instant.now());
-
-            colisProducts.add(colisProduct);
-
-            totalPoids += product.getPoids() * prodDto.getQuantity();
-            totalPrice += product.getPrice() * prodDto.getQuantity();
         }
 
         colis.setPoids(totalPoids);
@@ -207,15 +214,25 @@ public class ColisService {
         colis.getHistoriqueLivraisonList().add(historique);
 
         colis = colisRepository.save(colis);
-
         emailService.sendColisCreatedEmail(colis);
 
         return colisMapper.toDTO(colis);
     }
 
     public ColisResponseDTO findColisById(String colis_id){
-        Colis colis = colisRepository.findById(colis_id)
-                .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id: " + colis_id));
+        Colis colis = null;
+
+        if(authenticatedUserHelper.isSender()){
+            colis = colisRepository.findColisByIdAndSender_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce sender ou avec id : "+colis_id));
+        }else if (authenticatedUserHelper.isLivreur()){
+            colis = colisRepository.findColisByIdAndLivreur_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce livreur ou avec id: "+colis_id));
+        }else{
+            colis = colisRepository.findById(colis_id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Aucun colis avec id :" + colis_id));
+        }
+
         return colisMapper.toDTO(colis);
     }
 
@@ -406,8 +423,8 @@ public class ColisService {
     }
 
     public List<ColisResponseDTO> findAllColisForClient(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
+
         Sender sender = user.getSender();
 
         if (sender == null) {
@@ -422,9 +439,7 @@ public class ColisService {
     }
 
     public List<ColisSummaryDTO> findAllColisForReciever(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
 
         Receiver receiver = user.getReceiver();
 
@@ -448,14 +463,10 @@ public class ColisService {
     }
 
     public List<ColisResponseDTO> findAllColisForLivreurs(){
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        User user = userRepository.findUserByEmail(email);
+        User user = authenticatedUserHelper.getAuthenticatedUser();
 
         Livreur livreur = user.getLivreur();
+
         if (livreur == null) {
             throw new OperationNotAllowedException("You are not a livreur");
         }

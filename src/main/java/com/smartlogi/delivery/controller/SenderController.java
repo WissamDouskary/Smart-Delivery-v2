@@ -7,12 +7,14 @@ import com.smartlogi.delivery.service.SenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/sender")
+@PreAuthorize("hasAuthority('CAN_MANAGE_SENDERS')")
 @Tag(name = "Senders Management", description = "Endpoints for managing Senders")
 public class SenderController {
     private final SenderService senderService;

@@ -41,3 +41,7 @@ databaseChangeLog:
       file: db/changelog/021-create-email-field-livreur.yaml
   - include:
       file: db/changelog/022-add-user_id-receiver.yaml
+  - include:
+      file: db/changelog/023-create-role-table.yaml
+  - include:
+      file: db/changelog/024-add-senders-permission.yaml

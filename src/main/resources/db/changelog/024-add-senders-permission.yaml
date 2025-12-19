@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - property:
+      name: uuid_function
+      value: UUID()
+      dbms: mysql, mariadb, h2
+  - property:
+      name: uuid_function
+      value: gen_random_uuid()
+      dbms: postgresql
+
+  - changeSet:
+      id: add-sender-management-permission
+      author: smartlogi
+      changes:
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_MANAGE_SENDERS }
+
+        - sql:
+            sql: |
+              INSERT INTO roles_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p
+              WHERE r.name = 'Manager' 
+              AND p.name = 'CAN_MANAGE_SENDERS';
+
+  - changeSet:
+      id: add-sender-management-permission-v2
+      author: smartlogi
+      changes:
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: id, valueComputed: "${uuid_function}" }
+              - column: { name: name, value: CAN_READ_COLIS_HISTORIQUE_FULL }
+
+        - sql:
+            sql: |
+              INSERT INTO roles_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p
+              WHERE r.name = 'Manager' 
+              AND p.name = 'CAN_READ_COLIS_HISTORIQUE_FULL';

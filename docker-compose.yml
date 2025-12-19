@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: smart_logi_v2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Wissam0908
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  springboot-app:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_logi_v2
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD: 
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

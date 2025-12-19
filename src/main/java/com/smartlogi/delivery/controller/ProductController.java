@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Create a new Product", description = "Add a new Product with details")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PRODUCTS')")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> saveProduct(@Valid @RequestBody ProductRequestDTO dto){
         ProductResponseDTO saved = productService.save(dto);
 

@@ -6,8 +6,8 @@ import com.smartlogi.delivery.dto.responseDTO.ErrorResponse;
 import com.smartlogi.delivery.dto.responseDTO.LivreurResponseDTO;
 import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.delivery.service.LivreurService;
-import com.smartlogi.security.DTO.LoginRequest;
-import com.smartlogi.security.DTO.LoginResponse;
+import com.smartlogi.security.DTO.requestDTO.LoginRequest;
+import com.smartlogi.security.DTO.responseDTO.LoginResponse;
 import com.smartlogi.security.service.JwtService;
 import com.smartlogi.delivery.service.SenderService;
 import jakarta.validation.Valid;
@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority; // Import this
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,7 +65,6 @@ public class AuthenticationController {
                     )
             );
         }
-
         catch (BadCredentialsException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse(
@@ -80,8 +80,10 @@ public class AuthenticationController {
         final String jwtToken = jwtService.generateToken(userDetails);
 
         String role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> auth.startsWith("ROLE_"))
                 .findFirst()
-                .map(tk -> tk.getAuthority().replace("ROLE_", ""))
+                .map(roleName -> roleName.replace("ROLE_", ""))
                 .orElse("UNKNOWN");
 
         LoginResponse loginResponse = new LoginResponse();

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ColisRepository extends JpaRepository<Colis, String> {
@@ -17,6 +18,9 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
             String descKeyword,
             String villeKeyword
     );
+
+    Optional<Colis> findColisByIdAndLivreur_Id(String id, String livreurId);
+    Optional<Colis> findColisByIdAndSender_Id(String id, String senderId);
 
     @Query("""
         SELECT new com.smartlogi.delivery.dto.responseDTO.LivraisonStatsDTO(

@@ -1,54 +1,80 @@
 package com.smartlogi.delivery.exception;
 
-import com.smartlogi.delivery.dto.ApiResponse;
+import com.smartlogi.delivery.dto.responseDTO.ErrorResponse; // Import the new DTO
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Validation errors
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-        ApiResponse<Map<String, String>> apiResponse = new ApiResponse<>("Validation échouée", errors);
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Accès refusé : Vous n'avez pas la permission requise pour effectuer cette action.",
+                "Forbidden"
+        );
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
-    // Resource not found
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<String>> handleResourceNotFound(ResourceNotFoundException ex) {
-        ApiResponse<String> apiResponse = new ApiResponse<>(ex.getMessage(), null);
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
-    }
-
-    // operation not allowed
-    @ExceptionHandler(OperationNotAllowedException.class)
-    public ResponseEntity<ApiResponse<String>> handleOperationNotAllowed(OperationNotAllowedException exception){
-        ApiResponse<String> apiResponse = new ApiResponse<>(exception.getMessage(), null);
-        return new ResponseEntity<>(apiResponse, HttpStatus.METHOD_NOT_ALLOWED);
-    }
-
-    //unauthorized
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<String>> handleAccessDenied(AccessDeniedException exception){
-        ApiResponse<String> apiResponse = new ApiResponse<>(exception.getMessage(), null);
-        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Accès refusé : " + ex.getMessage(),
+                "Forbidden"
+        );
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
-    // Generic exceptions
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                "Not Found"
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OperationNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleOperationNotAllowed(OperationNotAllowedException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                ex.getMessage(),
+                "Method Not Allowed"
+        );
+        return new ResponseEntity<>(error, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation échouée: " + errorMessage,
+                "Bad Request"
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<String>> handleGenericException(Exception ex) {
-        ApiResponse<String> apiResponse = new ApiResponse<>("Internal server error", null);
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Une erreur interne est survenue : " + ex.getMessage(),
+                "Internal Server Error"
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
