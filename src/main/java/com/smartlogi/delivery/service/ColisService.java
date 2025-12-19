@@ -24,12 +24,11 @@ import com.smartlogi.delivery.repository.*;
 
 import com.smartlogi.security.config.SecurityConfig;
 import com.smartlogi.security.helper.AuthenticatedUserHelper;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +54,8 @@ public class ColisService {
     private final RoleRepository roleRepository;
     private final AuthenticatedUserHelper authenticatedUserHelper;
 
-    Dotenv dotenv = Dotenv.load();
+    @Value("${init.password}")
+    private String initPassword;
 
     @Autowired
     public ColisService(SenderRepository senderRepository,
@@ -108,7 +108,7 @@ public class ColisService {
 
             User user = new User();
             user.setEmail(dto.getReceiver().getEmail());
-            user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
+            user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
 
             Role receiverRole = roleRepository.findByName("Receiver")
                     .orElseThrow(() -> new ResourceNotFoundException("Role 'Receiver' not found"));
@@ -144,7 +144,7 @@ public class ColisService {
 
                 User user = new User();
                 user.setEmail(dto.getSender().getEmail());
-                user.setPassword(SecurityConfig.passwordEncoder().encode(dotenv.get("INIT_PASSWORD")));
+                user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
 
                 Role senderRole = roleRepository.findByName("Sender")
                         .orElseThrow(() -> new ResourceNotFoundException("Role 'Sender' not found"));
