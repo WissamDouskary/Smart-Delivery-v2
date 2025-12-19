@@ -24,8 +24,8 @@ services:
       - postgres
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_logi_v2
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Wissam0908
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD: 
     networks:
       - app-network
     env_file:
