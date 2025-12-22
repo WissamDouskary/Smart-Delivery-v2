@@ -8,7 +8,10 @@ import com.smartlogi.delivery.model.Sender;
 import com.smartlogi.delivery.repository.SenderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +21,18 @@ import static org.mockito.Mockito.*;
 
 class SenderServiceTest {
 
+    @Mock
     private SenderRepository senderRepository;
+    @Mock
     private SenderMapper senderMapper;
+
+    @InjectMocks
     private SenderService senderService;
 
     @BeforeEach
     void setUp() {
         senderRepository = mock(SenderRepository.class);
         senderMapper = mock(SenderMapper.class);
-        senderService = new SenderService(senderRepository, senderMapper);
     }
 
     @Test
