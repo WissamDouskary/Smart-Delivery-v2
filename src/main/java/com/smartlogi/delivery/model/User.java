@@ -51,7 +51,7 @@ public class User {
     @NotNull
     @ColumnDefault("true")
     @Column(name = "enable", nullable = false)
-    private Boolean enable = false;
+    private Boolean enable = true;
 
     public Boolean getEnable() {
         return enable;
