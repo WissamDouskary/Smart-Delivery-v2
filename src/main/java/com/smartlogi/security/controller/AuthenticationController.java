@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -93,6 +94,16 @@ public class AuthenticationController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<SenderResponseDTO> defaultRegister(@Valid @RequestBody SenderRequestDTO request) {
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Le mot de passe ne peut être nul.");
+        }
+        SenderResponseDTO savedSender = senderService.saveSender(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedSender);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_Manager')")
     @PostMapping("/register/sender")
     public ResponseEntity<SenderResponseDTO> registerSender(@Valid @RequestBody SenderRequestDTO request) {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
@@ -102,6 +113,7 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSender);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_Manager')")
     @PostMapping("/register/livreur")
     public ResponseEntity<LivreurResponseDTO> registerLivreur(@Valid @RequestBody LivreurRequestDTO request) {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
