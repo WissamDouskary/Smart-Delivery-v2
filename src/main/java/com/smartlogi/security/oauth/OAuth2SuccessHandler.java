@@ -37,6 +37,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
         String providerId = oAuth2User.getAttribute("sub");
 
+        if (providerId == null) {
+            throw new IllegalStateException("Google provider ID is missing");
+        }
+
         UserDetails userDetails;
 
         try {
