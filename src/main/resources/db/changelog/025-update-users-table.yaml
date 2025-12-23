@@ -39,3 +39,17 @@ databaseChangeLog:
             tableName: users
             columnName: enable
             defaultValueBoolean: true
+
+  - changeSet:
+      id: add-role-pending-to-table-roles
+      author: wissam
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: e904c6c7-b2a6-457a-adb8-7bf0d74ce5c7
+              - column:
+                  name: name
+                  value: Pending
