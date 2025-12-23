@@ -1,6 +1,7 @@
 package com.smartlogi.security.config;
 
 import com.smartlogi.security.filter.JwtAuthenticationFilter;
+import com.smartlogi.security.oauth.OAuth2SuccessHandler;
 import com.smartlogi.security.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,12 +28,16 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler successHandler;
 
     @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
-                          JwtAuthenticationFilter jwtAuthFilter) {
+                          JwtAuthenticationFilter jwtAuthFilter,
+                            OAuth2SuccessHandler successHandler
+    ) {
         this.customUserDetailsService = customUserDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
+        this.successHandler = successHandler;
     }
 
     @Bean
@@ -52,6 +57,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth -> oauth.successHandler(successHandler))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
