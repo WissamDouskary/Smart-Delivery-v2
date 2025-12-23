@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/colis/receiver/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/colis/{id}/historique").permitAll()
 
