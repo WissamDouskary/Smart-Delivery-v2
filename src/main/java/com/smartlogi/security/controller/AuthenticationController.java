@@ -5,6 +5,8 @@ import com.smartlogi.delivery.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.ErrorResponse;
 import com.smartlogi.delivery.dto.responseDTO.LivreurResponseDTO;
 import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
+import com.smartlogi.delivery.model.User;
+import com.smartlogi.delivery.repository.UserRepository;
 import com.smartlogi.delivery.service.LivreurService;
 import com.smartlogi.security.DTO.requestDTO.LoginRequest;
 import com.smartlogi.security.DTO.responseDTO.LoginResponse;
@@ -18,10 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority; // Import this
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,7 @@ public class AuthenticationController {
     private final UserDetailsService userDetailsService;
     private final SenderService senderService;
     private final LivreurService livreurService;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Autowired
     public AuthenticationController(
@@ -46,17 +47,32 @@ public class AuthenticationController {
             UserDetailsService userDetailsService,
             SenderService senderService,
             LivreurService livreurService,
-            PasswordEncoder passwordEncoder) {
+            UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.senderService = senderService;
-        this.passwordEncoder = passwordEncoder;
         this.livreurService = livreurService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@Valid @RequestBody LoginRequest request) {
+        User user = userRepository.findUserByEmail(request.getEmail());
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(401, "User not found", "Unauthorized"));
+        }
+
+        if(user.getProvider() != null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse(
+                            HttpStatus.UNAUTHORIZED.value(),
+                            "This account must be authenticated using Provider : " + user.getProvider(),
+                            "Unauthorized"
+                    )
+            );
+        }
 
         try {
             Authentication authentication = authenticationManager.authenticate(
