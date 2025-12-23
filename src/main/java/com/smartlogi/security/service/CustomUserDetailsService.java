@@ -51,14 +51,19 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
         }
 
-        String password = user.getPassword();
-        if (password == null || password.isEmpty()) {
-            password = "123456789";
+        boolean isProviderUser = user.getProvider() != null && user.getProviderId() != null;
+        boolean isAdmin = user.getRoleEntity().getName().equalsIgnoreCase("ADMIN");
+
+        if (isProviderUser && !isAdmin) {
+            String providerName = user.getProvider();
+            throw new UsernameNotFoundException(
+                    "This account must be authenticated using "+providerName
+            );
         }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
-                password,
+                user.getPassword(),
                 authorities
         );
     }
