@@ -35,10 +35,22 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String email = oAuth2User.getAttribute("email");
-        String providerId = oAuth2User.getAttribute("sub");
 
-        if (providerId == null) {
-            throw new IllegalStateException("Google provider ID is missing");
+        if (email == null || email.isEmpty()) {
+            throw new IllegalStateException("Email is missing from OAuth2 provider");
+        }
+
+        String providerId;
+        String provider;
+
+        if (oAuth2User.getAttribute("sub") != null) {
+            providerId = oAuth2User.getAttribute("sub");
+            provider = "GOOGLE";
+        } else if (oAuth2User.getAttribute("id") != null) {
+            providerId = oAuth2User.getAttribute("id");
+            provider = "FACEBOOK";
+        } else {
+            throw new IllegalStateException("OAuth2 provider ID is missing");
         }
 
         UserDetails userDetails;
@@ -46,7 +58,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         try {
             userDetails = customUserDetailsService.loadUserByUsername(email);
         } catch (UsernameNotFoundException ex) {
-            userDetails = customUserDetailsService.createOAuth2User(email, providerId);
+            userDetails = customUserDetailsService.createOAuth2User(email, providerId, provider);
         }
 
         String token = jwtService.generateToken(userDetails);
