@@ -51,31 +51,22 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
         }
 
-        boolean isProviderUser = user.getProvider() != null && user.getProviderId() != null;
-        boolean isAdmin = user.getRoleEntity().getName().equalsIgnoreCase("ADMIN");
-
-        if (isProviderUser && !isAdmin) {
-            String providerName = user.getProvider();
-            throw new UsernameNotFoundException(
-                    "This account must be authenticated using "+providerName
-            );
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                authorities
-        );
+        return org.springframework.security.core.userdetails.User.builder()
+                .authorities(authorities)
+                .password(user.getPassword())
+                .username(user.getEmail())
+                .disabled(!user.getEnable())
+                .build();
     }
 
-    public UserDetails createOAuth2User(String email, String provider_id) {
+    public UserDetails createOAuth2User(String email, String provider_id, String provider) {
         Role roleEntity = roleRepository.findByName("Pending")
                 .orElseThrow(() -> new ResourceNotFoundException("Pending not found"));
 
         User user = new User();
         user.setEmail(email);
         user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
-        user.setProvider("GOOGLE");
+        user.setProvider(provider);
         user.setProviderId(provider_id);
         user.setRoleEntity(roleEntity);
 
