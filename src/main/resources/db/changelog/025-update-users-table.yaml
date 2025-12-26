@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 025-update-users-table
+      author: wissam
+      changes:
+        - dropNotNullConstraint:
+            tableName: users
+            columnName: password
+            columnDataType: varchar(255)
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: provider
+                  type: varchar(155)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: provider_id
+                  type: varchar
+                  constraints:
+                    nullable: true
+              - column:
+                  name: enable
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: change-default-enable-value
+      author: wissam
+      changes:
+        - dropDefaultValue:
+            tableName: users
+            columnName: enable
+            columnDataType: boolean
+        - addDefaultValue:
+            tableName: users
+            columnName: enable
+            defaultValueBoolean: true
+
+  - changeSet:
+      id: add-role-pending-to-table-roles
+      author: wissam
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: e904c6c7-b2a6-457a-adb8-7bf0d74ce5c7
+              - column:
+                  name: name
+                  value: Pending

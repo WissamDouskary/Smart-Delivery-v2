@@ -1,5 +1,6 @@
 package com.smartlogi.delivery.service;
 
+import com.smartlogi.delivery.dto.requestsDTO.CompleteProfileDTO;
 import com.smartlogi.delivery.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.delivery.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import com.smartlogi.delivery.model.User;
 import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.repository.SenderRepository;
 import com.smartlogi.delivery.repository.UserRepository; // Import correct repo
+import com.smartlogi.security.helper.AuthenticatedUserHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,18 +25,21 @@ public class SenderService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticatedUserHelper authenticatedUserHelper;
 
     @Autowired
     public SenderService(SenderRepository senderRepository,
                          SenderMapper senderMapper,
                          UserRepository userRepository,
                          RoleRepository roleRepository,
-                         PasswordEncoder passwordEncoder){
+                         PasswordEncoder passwordEncoder,
+                         AuthenticatedUserHelper authenticatedUserHelper){
         this.senderRepository = senderRepository;
         this.senderMapper = senderMapper;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticatedUserHelper = authenticatedUserHelper;
     }
 
     public SenderResponseDTO saveSender(SenderRequestDTO dto){
@@ -75,5 +80,26 @@ public class SenderService {
             throw new ResourceNotFoundException("aucun senders!");
         }
         return senderMapper.toResponseDTOList(senders);
+    }
+
+    public SenderResponseDTO completeSenderProfile(CompleteProfileDTO dto) {
+        User authUser = authenticatedUserHelper.getAuthenticatedUser();
+
+        if (authUser.getSender() != null) {
+            throw new IllegalStateException("Sender already exists");
+        }
+
+        Role senderRole = roleRepository.findByName("Sender")
+                .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
+
+        Sender sender = senderMapper.toProfileCompletionEntity(dto);
+        sender.setUser(authUser);
+        sender.setEmail(authUser.getEmail());
+        authUser.setSender(sender);
+        authUser.setRoleEntity(senderRole);
+
+        senderRepository.save(sender);
+
+        return senderMapper.toDTO(sender);
     }
 }

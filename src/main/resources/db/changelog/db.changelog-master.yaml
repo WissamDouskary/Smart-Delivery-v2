@@ -45,3 +45,5 @@ databaseChangeLog:
       file: db/changelog/023-create-role-table.yaml
   - include:
       file: db/changelog/024-add-senders-permission.yaml
+  - include:
+      file: db/changelog/025-update-users-table.yaml

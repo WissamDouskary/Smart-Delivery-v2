@@ -1,6 +1,7 @@
 package com.smartlogi.delivery.controller;
 
 import com.smartlogi.delivery.dto.ApiResponse;
+import com.smartlogi.delivery.dto.requestsDTO.CompleteProfileDTO;
 import com.smartlogi.delivery.dto.requestsDTO.SenderRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
 import com.smartlogi.delivery.service.SenderService;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,5 +47,16 @@ public class SenderController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<SenderResponseDTO>>> findAll(){
         return ResponseEntity.ok(new ApiResponse<>("Sender donner avec success", senderService.findAll()));
+    }
+
+    @PostMapping("/complete-profile")
+    @PreAuthorize("hasRole('ROLE_Pending')")
+    public ResponseEntity<ApiResponse<SenderResponseDTO>> completeProfile(
+            @RequestBody CompleteProfileDTO dto
+    ) {
+        SenderResponseDTO sender = senderService.completeSenderProfile(dto);
+        return ResponseEntity.ok(
+                new ApiResponse<>("Profile completed!", sender)
+        );
     }
 }

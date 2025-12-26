@@ -1,9 +1,14 @@
 package com.smartlogi.security.service;
 
+import com.smartlogi.delivery.exception.ResourceNotFoundException;
 import com.smartlogi.delivery.model.Permission;
+import com.smartlogi.delivery.model.Role;
 import com.smartlogi.delivery.model.User;
+import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.repository.UserRepository;
+import com.smartlogi.security.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -21,6 +25,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${init.password}")
+    private String initPassword;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -41,10 +51,31 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
         }
 
+        return org.springframework.security.core.userdetails.User.builder()
+                .authorities(authorities)
+                .password(user.getPassword())
+                .username(user.getEmail())
+                .disabled(!user.getEnable())
+                .build();
+    }
+
+    public UserDetails createOAuth2User(String email, String provider_id, String provider) {
+        Role roleEntity = roleRepository.findByName("Pending")
+                .orElseThrow(() -> new ResourceNotFoundException("Pending not found"));
+
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
+        user.setProvider(provider);
+        user.setProviderId(provider_id);
+        user.setRoleEntity(roleEntity);
+
+        userRepository.save(user);
+
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
-                user.getPassword(),
-                authorities
+                "",
+                List.of(new SimpleGrantedAuthority("ROLE_"+roleEntity.getName()))
         );
     }
 }
