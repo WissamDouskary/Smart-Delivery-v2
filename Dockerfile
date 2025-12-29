@@ -1,12 +1,9 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
-WORKDIR /build
+FROM maven:3.9.9-eclipse-temurin-17
+WORKDIR /app
+
 COPY pom.xml .
-RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jre-jammy
-WORKDIR /app
-COPY --from=builder /build/target/*.war app.war
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.war"]
+CMD ["java", "-jar", "target/smartLogi-v2-0.2.0-SNAPSHOT.war"]
