@@ -15,29 +15,29 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
 
         stage('Tests') {
             steps {
-                sh 'mvn test'
+                bat 'mvn test'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                sh '''
-                mvn sonar:sonar \
-                  -Dsonar.projectKey=sdms \
-                  -Dsonar.host.url=$SONAR_HOST_URL
-                '''
+                bat """
+                mvn sonar:sonar ^
+                  -Dsonar.projectKey=sdms ^
+                  -Dsonar.host.url=%SONAR_HOST_URL%
+                """
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t sdms-app .'
+                bat 'docker build -t sdms-app .'
             }
         }
     }
