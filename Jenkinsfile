@@ -5,6 +5,7 @@ pipeline {
         SONAR_HOST_URL = 'http://sonarqube:9000'
     }
     tools {
+        jdk 'JDK17'
         maven 'Maven'
     }
 
