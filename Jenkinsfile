@@ -4,6 +4,9 @@ pipeline {
     environment {
         SONAR_HOST_URL = 'http://sonarqube:9000'
     }
+    tools {
+            maven 'Maven 3.8.9'
+    }
 
     stages {
 
