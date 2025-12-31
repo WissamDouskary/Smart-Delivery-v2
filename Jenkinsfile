@@ -24,12 +24,13 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'sonarQube'
+            }
             steps {
-                bat """
-                mvn sonar:sonar ^
-                  -Dsonar.projectKey=sdms ^
-                  -Dsonar.host.url=%SONAR_HOST_URL%
-                """
+                withSonarQubeEnv('SonarQubeLocal') {
+                    bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat -Dsonar.projectKey=sdms -Dsonar.sources=src/main/java"
+                }
             }
         }
 
