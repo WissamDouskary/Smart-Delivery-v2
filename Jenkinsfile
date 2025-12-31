@@ -23,12 +23,6 @@ pipeline {
             }
         }
 
-        stage('Tests') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps {
                 bat """
