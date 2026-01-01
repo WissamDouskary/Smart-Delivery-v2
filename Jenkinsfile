@@ -23,10 +23,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQubeLocal') {
-                    bat '''
-                    mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.2.0.4988:sonar ^
-                        -Dsonar.projectKey=sdms
-                    '''
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        bat '''
+                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.2.0.4988:sonar ^
+                          -Dsonar.projectKey=sdms ^
+                          -Dsonar.login=%SONAR_TOKEN%
+                        '''
+                    }
                 }
             }
         }
