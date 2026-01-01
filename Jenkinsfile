@@ -21,6 +21,11 @@ pipeline {
         }
 
         stage('Docker Build & Run') {
+            environment {
+                POSTGRES_USER     = credentials('POSTGRES_USER')
+                POSTGRES_PASSWORD = credentials('POSTGRES_PASSWORD')
+                POSTGRES_DB       = credentials('POSTGRES_DB')
+            }
             steps {
                 bat 'docker-compose up -d --build'
             }
