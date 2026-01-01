@@ -1,9 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        SONAR_HOST_URL = 'http://sonarqube:9000'
-    }
     tools {
         jdk 'JDK17'
         maven 'Maven'
@@ -24,12 +21,9 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool 'SonarQubeLocal'
-            }
             steps {
                 withSonarQubeEnv('SonarQubeLocal') {
-                    bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat -Dsonar.projectKey=sdms -Dsonar.sources=src/main/java"
+                    bat 'mvn sonar:sonar -Dsonar.projectKey=sdms'
                 }
             }
         }
@@ -42,11 +36,11 @@ pipeline {
     }
 
     post {
-        failure {
-            echo 'Pipeline Failed'
-        }
         success {
             echo 'Pipeline Success'
+        }
+        failure {
+            echo 'Pipeline Failed'
         }
     }
 }
