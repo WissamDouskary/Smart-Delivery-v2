@@ -10,7 +10,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/WissamDouskary/Smart-Delivery-v2'
+                git branch: 'ci/jenkins', url: 'https://github.com/WissamDouskary/Smart-Delivery-v2'
             }
         }
 
