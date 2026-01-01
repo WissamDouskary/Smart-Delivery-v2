@@ -20,9 +20,9 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Docker Build & Run') {
             steps {
-                bat 'docker build -t sdms-app .'
+                bat 'docker-compose up -d --build'
             }
         }
     }
