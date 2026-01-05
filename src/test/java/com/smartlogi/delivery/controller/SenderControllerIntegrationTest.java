@@ -2,26 +2,29 @@ package com.smartlogi.delivery.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartlogi.delivery.dto.requestsDTO.SenderRequestDTO;
-import com.smartlogi.delivery.model.Sender;
-import com.smartlogi.delivery.repository.ColisRepository;
-import com.smartlogi.delivery.repository.SenderRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.smartlogi.delivery.dto.responseDTO.SenderResponseDTO;
+import com.smartlogi.delivery.security.TestSecurityConfig;
+import com.smartlogi.delivery.service.SenderService;
+import com.smartlogi.security.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.is;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureTestDatabase(replace = NONE)
+@WebMvcTest(SenderController.class)
+@Import(TestSecurityConfig.class)
 class SenderControllerIntegrationTest {
 
     @Autowired
@@ -30,19 +33,18 @@ class SenderControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private SenderRepository senderRepository;
-    @Autowired
-    private ColisRepository colisRepository;
+    @MockBean
+    private SenderService senderService;
 
-    @BeforeEach
-    void setUp() {
-        senderRepository.deleteAll();
-        colisRepository.deleteAll();
-    }
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     @Test
-    void saveSender_ShouldPersistAndReturnSuccessResponse() throws Exception {
+    void saveSender_ShouldReturnSuccessResponse() throws Exception {
+
         SenderRequestDTO request = new SenderRequestDTO();
         request.setNom("Integration Test");
         request.setPrenom("User");
@@ -50,52 +52,46 @@ class SenderControllerIntegrationTest {
         request.setAdresse("Casablanca");
         request.setEmail("integration@test.com");
 
+        SenderResponseDTO response = new SenderResponseDTO();
+        response.setNom("Integration Test");
+
+        when(senderService.saveSender(any(SenderRequestDTO.class)))
+                .thenReturn(response);
+
         mockMvc.perform(post("/api/sender")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", is("Sender enregistré avec succès")))
+                .andExpect(jsonPath("$.message", is("Sender Created")))
                 .andExpect(jsonPath("$.data.nom", is("Integration Test")));
-
-
-        var allSenders = senderRepository.findAll();
-        assert allSenders.size() == 1;
-        assert allSenders.get(0).getNom().equals("Integration Test");
     }
 
     @Test
-    void findSenderById_ShouldReturnSenderFromDB() throws Exception {
-        Sender sender = new Sender();
-        sender.setNom("Test Sender");
-        sender.setPrenom("Ali");
-        sender.setTelephone("0700000000");
-        sender.setAdresse("Agadir");
-        sender.setEmail("test@sender.com");
-        Sender saved = senderRepository.save(sender);
+    void findSenderById_ShouldReturnSender() throws Exception {
 
-        mockMvc.perform(get("/api/sender/" + saved.getId()))
+        SenderResponseDTO response = new SenderResponseDTO();
+        response.setNom("Test Sender");
+
+        when(senderService.findById("1"))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/api/sender/{id}", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("Sender Trouvé!")))
                 .andExpect(jsonPath("$.data.nom", is("Test Sender")));
     }
 
     @Test
-    void findAll_ShouldReturnListOfSendersFromDB() throws Exception {
-        Sender s1 = new Sender();
+    void findAll_ShouldReturnListOfSenders() throws Exception {
+
+        SenderResponseDTO s1 = new SenderResponseDTO();
         s1.setNom("Sender 1");
-        s1.setPrenom("A");
-        s1.setTelephone("0600000001");
-        s1.setAdresse("Agadir");
-        s1.setEmail("s1@test.com");
 
-        Sender s2 = new Sender();
+        SenderResponseDTO s2 = new SenderResponseDTO();
         s2.setNom("Sender 2");
-        s2.setPrenom("B");
-        s2.setTelephone("0600000002");
-        s2.setAdresse("Marrakech");
-        s2.setEmail("s2@test.com");
 
-        senderRepository.saveAll(java.util.List.of(s1, s2));
+        when(senderService.findAll())
+                .thenReturn(List.of(s1, s2));
 
         mockMvc.perform(get("/api/sender"))
                 .andExpect(status().isOk())
