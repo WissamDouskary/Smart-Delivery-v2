@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -62,16 +63,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         String token = jwtService.generateToken(userDetails);
-
-        LoginResponse apiResponse = new LoginResponse();
-        apiResponse.setToken(token);
-        apiResponse.setUserRole(userDetails.getAuthorities().stream()
+        String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(r -> r.startsWith("ROLE_"))
                 .findFirst()
                 .map(roleName -> roleName.replace("ROLE_", ""))
-                .orElse("UNKNOWN")
-        );
+                .orElse("UNKNOWN");
+
+        LoginResponse apiResponse = new LoginResponse();
+        apiResponse.setToken(token);
+        apiResponse.setUserRole(role);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
@@ -79,5 +80,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.getWriter().write(
                 objectMapper.writeValueAsString(apiResponse)
         );
+
+        String redirectUrl = UriComponentsBuilder
+                .fromUriString("http://localhost:4200/oauth2/callback")
+                .queryParam("token", token)
+                .queryParam("userRole", role)
+                .build()
+                .toUriString();
+
+        response.sendRedirect(redirectUrl);
     }
 }

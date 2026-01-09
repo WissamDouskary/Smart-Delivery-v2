@@ -2,6 +2,7 @@ package com.smartlogi.delivery.service;
 
 import com.smartlogi.delivery.dto.requestsDTO.ColisProductsRequestDTO;
 import com.smartlogi.delivery.dto.requestsDTO.ColisRequestDTO;
+import com.smartlogi.delivery.exception.AccessDeniedException;
 import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.delivery.dto.responseDTO.*;
 import com.smartlogi.delivery.mapper.ColisMapper;
@@ -12,14 +13,11 @@ import com.smartlogi.delivery.repository.ColisRepository;
 import com.smartlogi.delivery.repository.ProductRepository;
 import com.smartlogi.delivery.repository.ReceiverRepository;
 import com.smartlogi.delivery.repository.SenderRepository;
-import com.smartlogi.delivery.dto.responseDTO.*;
 import com.smartlogi.delivery.enums.Priority;
 import com.smartlogi.delivery.enums.Status;
 import com.smartlogi.delivery.exception.OperationNotAllowedException;
 import com.smartlogi.delivery.exception.ResourceNotFoundException;
 import com.smartlogi.delivery.mail.service.EmailService;
-import com.smartlogi.delivery.mapper.*;
-import com.smartlogi.delivery.model.*;
 import com.smartlogi.delivery.repository.*;
 
 import com.smartlogi.security.config.SecurityConfig;
@@ -29,6 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -289,7 +289,8 @@ public class ColisService {
             String ville,
             String priority,
             Pageable pageable
-    ){
+    ) {
+
         Status enumStatus = null;
         if (status != null && !status.isEmpty()) {
             try {
@@ -300,16 +301,37 @@ public class ColisService {
         }
 
         Priority enumPriority = null;
-        if(priority != null && !priority.isEmpty()){
-            try{
+        if (priority != null && !priority.isEmpty()) {
+            try {
                 enumPriority = Priority.valueOf(priority.toUpperCase());
-            }
-            catch (IllegalArgumentException e){
-                throw new ResourceNotFoundException("Invalid priority: "+priority);
+            } catch (IllegalArgumentException e) {
+                throw new ResourceNotFoundException("Invalid priority: " + priority);
             }
         }
 
-        Page<Colis> page = colisRepository.findAll(pageable);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("CAN_READ_ALL_COLIS"));
+
+        boolean isSender = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_Sender"));
+
+        boolean isLivreur = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_Livreur"));
+
+        Page<Colis> page;
+
+        if (isAdmin) {
+            page = colisRepository.findAll(pageable);
+        } else if (isSender) {
+            page = colisRepository.findBySender_Email(email, pageable);
+        } else if (isLivreur) {
+            page = colisRepository.findByLivreur_Email(email, pageable);
+        } else {
+            throw new AccessDeniedException("Access denied");
+        }
 
         Status finalEnumStatus = enumStatus;
         Priority finalEnumPriority = enumPriority;
@@ -319,12 +341,15 @@ public class ColisService {
                 .filter(c -> finalEnumStatus == null || c.getStatus() == finalEnumStatus)
                 .filter(c -> finalEnumPriority == null || c.getPriority() == finalEnumPriority)
                 .filter(c -> ville == null || c.getVileDistination().equalsIgnoreCase(ville))
-                .filter(c -> zone == null || (c.getCity() != null && c.getCity().getNom().equalsIgnoreCase(zone)))
+                .filter(c -> zone == null ||
+                        (c.getCity() != null && c.getCity().getNom().equalsIgnoreCase(zone)))
                 .map(colisMapper::toDTO)
                 .toList();
-        if(filtered.isEmpty()){
-            throw new ResourceNotFoundException("Aucun colis, essayer de changer le filter");
+
+        if (filtered.isEmpty()) {
+            throw new ResourceNotFoundException("Aucun colis pour ce user ou essayer de changer le filter");
         }
+
         return new PageImpl<>(filtered, pageable, filtered.size());
     }
 
@@ -428,7 +453,7 @@ public class ColisService {
         Sender sender = user.getSender();
 
         if (sender == null) {
-            throw new OperationNotAllowedException("You are not a livreur");
+            throw new OperationNotAllowedException("You are not a Sender");
         }
 
         List<Colis> colisList = colisRepository.findColisBySender_Id(sender.getId());
@@ -493,5 +518,21 @@ public class ColisService {
         return colisMapper.toDTO(colis);
     }
 
+    private Status parseStatus(String status) {
+        if (status == null || status.isEmpty()) return null;
+        try {
+            return Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Invalid status: " + status);
+        }
+    }
 
+    private Priority parsePriority(String priority) {
+        if (priority == null || priority.isEmpty()) return null;
+        try {
+            return Priority.valueOf(priority.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Invalid priority: " + priority);
+        }
+    }
 }

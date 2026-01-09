@@ -5,6 +5,7 @@ import com.smartlogi.delivery.dto.requestsDTO.ColisRequestDTO;
 import com.smartlogi.delivery.dto.responseDTO.ColisUpdateDTO;
 import com.smartlogi.delivery.dto.responseDTO.ColisResponseDTO;
 import com.smartlogi.delivery.dto.responseDTO.ColisSummaryDTO;
+import com.smartlogi.delivery.dto.responseDTO.HistoriqueLivraisonResponseDTO;
 import com.smartlogi.delivery.enums.Status;
 import com.smartlogi.delivery.service.ColisService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,7 @@ public class ColisController {
 
     @Operation(summary = "List all colis", description = "Retrieve all colis with optional filters and pagination")
     @GetMapping
-    @PreAuthorize("hasAuthority('CAN_READ_ALL_COLIS')")
+    @PreAuthorize("hasAnyAuthority('CAN_READ_ALL_COLIS','CAN_READ_OWN_COLIS','CAN_READ_OWN_COLIS_LIVREUR')")
     public ResponseEntity<ApiResponse<Page<ColisResponseDTO>>> findAllColis(
             @Parameter(description = "Status of the colis") @RequestParam(required = false) String status,
             @Parameter(description = "Zone of the colis") @RequestParam(required = false) String zone,
@@ -131,9 +132,8 @@ public class ColisController {
 
     @Operation(summary = "Get colis history", description = "Retrieve the full history of a colis by ID")
     @GetMapping("/{id}/historique")
-    @PreAuthorize("hasAnyAuthority('[CAN_READ_OWN_COLIS_HISTORIQUE, CAN_READ_COLIS_HISTORIQUE_FULL]')")
-    public ResponseEntity<ApiResponse<ColisResponseDTO>> getColisHistorique(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<List<HistoriqueLivraisonResponseDTO>>> getColisHistorique(@PathVariable String id) {
         ColisResponseDTO response = colisService.getColisHistorique(id);
-        return ResponseEntity.ok(new ApiResponse<>("Historique du colis récupéré", response));
+        return ResponseEntity.ok(new ApiResponse<>("Historique du colis récupéré", response.getHistoriqueLivraisonList()));
     }
 }

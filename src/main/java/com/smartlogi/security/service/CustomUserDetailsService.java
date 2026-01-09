@@ -60,9 +60,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails createOAuth2User(String email, String provider_id, String provider) {
-        Role roleEntity = roleRepository.findByName("Pending")
-                .orElseThrow(() -> new ResourceNotFoundException("Pending not found"));
-
+        Role roleEntity = roleRepository.findByName("Sender")
+                .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
         User user = new User();
         user.setEmail(email);
         user.setPassword(SecurityConfig.passwordEncoder().encode(initPassword));
