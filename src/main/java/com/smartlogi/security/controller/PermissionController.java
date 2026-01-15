@@ -15,7 +15,6 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/permission")
-@PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
 public class PermissionController {
     private final PermissionService permissionService;
 
@@ -24,6 +23,7 @@ public class PermissionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
     public ResponseEntity<ApiResponse<PermissionResponseDTO>> createPermission(
             @RequestBody PermissionRequestDTO dto
     ){
@@ -34,6 +34,7 @@ public class PermissionController {
     }
 
     @PutMapping("/{permissionId}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
     public ResponseEntity<ApiResponse<PermissionResponseDTO>> updatePermission(
             @PathVariable String permissionId,
             @RequestBody PermissionRequestDTO dto
@@ -47,6 +48,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/{permissionId}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
     public ResponseEntity<ApiResponse<Void>> deletePermission(
             @PathVariable String permissionId
     ){
@@ -58,6 +60,7 @@ public class PermissionController {
     }
 
     @PostMapping("/affect/{role_name}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
     public ResponseEntity<ApiResponse<PermissionRoleResponseDTO>> affectPermissionsToRole(
             @RequestBody List<String> permissionIds,
             @PathVariable("role_name") String roleName
@@ -69,6 +72,7 @@ public class PermissionController {
     }
 
     @GetMapping("/roles")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_PERMISSIONS')")
     public List<PermissionRoleResponseDTO> getAllRolesWithPermissions() {
         return permissionService.getAllRolesWithPermissions();
     }

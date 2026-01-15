@@ -223,10 +223,10 @@ public class ColisService {
         Colis colis = null;
 
         if(authenticatedUserHelper.isSender()){
-            colis = colisRepository.findColisByIdAndSender_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+            colis = colisRepository.findByIdAndSender_Id(colis_id, authenticatedUserHelper.getAuthenticatedUser().getSender().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce sender ou avec id : "+colis_id));
         }else if (authenticatedUserHelper.isLivreur()){
-            colis = colisRepository.findColisByIdAndLivreur_Id(colis_id, authenticatedUserHelper.getAuthUserId())
+            colis = colisRepository.findByIdAndLivreur_Id(colis_id, authenticatedUserHelper.getAuthenticatedUser().getLivreur().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Aucun colis pour ce livreur ou avec id: "+colis_id));
         }else{
             colis = colisRepository.findById(colis_id)

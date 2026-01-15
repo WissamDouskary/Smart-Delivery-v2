@@ -43,7 +43,7 @@ public class ColisController {
 
     @Operation(summary = "get colis by id")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('[CAN_READ_ALL_COLIS, CAN_READ_OWN_COLIS]')")
+    @PreAuthorize("hasAnyAuthority('CAN_READ_ALL_COLIS','CAN_READ_OWN_COLIS','CAN_READ_OWN_COLIS_LIVREUR')")
     public ResponseEntity<ApiResponse<ColisResponseDTO>> findColisById(@PathVariable("id") String id){
         return ResponseEntity.ok(new ApiResponse<>("Colis donner avec success", colisService.findColisById(id)));
     }

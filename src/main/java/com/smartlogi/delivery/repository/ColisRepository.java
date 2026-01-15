@@ -18,7 +18,6 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
     List<Colis> findColisByLivreur_Id(String livreurId);
 
     Page<Colis> findBySender_Email(String email, Pageable pageable);
-
     Page<Colis> findByLivreur_Email(String email, Pageable pageable);
 
     List<Colis> findByDescriptionContainingIgnoreCaseOrVileDistinationContainingIgnoreCase(
@@ -26,8 +25,8 @@ public interface ColisRepository extends JpaRepository<Colis, String> {
             String villeKeyword
     );
 
-    Optional<Colis> findColisByIdAndLivreur_Id(String id, String livreurId);
-    Optional<Colis> findColisByIdAndSender_Id(String id, String senderId);
+    Optional<Colis> findByIdAndLivreur_Id(String id, String livreurId);
+    Optional<Colis> findByIdAndSender_Id(String id, String senderId);
 
     @Query("""
         SELECT new com.smartlogi.delivery.dto.responseDTO.LivraisonStatsDTO(

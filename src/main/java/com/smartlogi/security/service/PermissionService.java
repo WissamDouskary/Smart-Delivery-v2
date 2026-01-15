@@ -5,10 +5,12 @@ import com.smartlogi.delivery.exception.ResourceNotFoundException;
 import com.smartlogi.delivery.mapper.PermissionMapper;
 import com.smartlogi.delivery.model.Permission;
 import com.smartlogi.delivery.model.Role;
+import com.smartlogi.delivery.model.User;
 import com.smartlogi.delivery.repository.RoleRepository;
 import com.smartlogi.security.DTO.requestDTO.PermissionRequestDTO;
 import com.smartlogi.security.DTO.responseDTO.PermissionResponseDTO;
 import com.smartlogi.security.DTO.responseDTO.PermissionRoleResponseDTO;
+import com.smartlogi.security.helper.AuthenticatedUserHelper;
 import com.smartlogi.security.repository.PermissionRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,35 +23,38 @@ public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final PermissionMapper permissionMapper;
     private final RoleRepository roleRepository;
+    private final AuthenticatedUserHelper authenticatedUserHelper;
 
     public PermissionService(
             PermissionRepository permissionRepository,
             PermissionMapper permissionMapper,
-            RoleRepository roleRepository
-    ){
+            RoleRepository roleRepository,
+            AuthenticatedUserHelper authenticatedUserHelper
+    ) {
         this.permissionRepository = permissionRepository;
         this.permissionMapper = permissionMapper;
         this.roleRepository = roleRepository;
+        this.authenticatedUserHelper = authenticatedUserHelper;
     }
 
-    public PermissionResponseDTO createPermission(PermissionRequestDTO dto){
+    public PermissionResponseDTO createPermission(PermissionRequestDTO dto) {
         Permission permission = permissionMapper.toEntity(dto);
         Permission saved = permissionRepository.save(permission);
         return permissionMapper.toResponse(saved);
     }
 
-    public PermissionResponseDTO updatePermission(PermissionRequestDTO dto, String permissionId){
+    public PermissionResponseDTO updatePermission(PermissionRequestDTO dto, String permissionId) {
         Permission basePermission = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Aucun permission avec id: "+permissionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun permission avec id: " + permissionId));
 
         permissionMapper.updatePermissionFromDto(dto, basePermission);
 
         return permissionMapper.toResponse(basePermission);
     }
 
-    public void deletePermission(String permissionId){
+    public void deletePermission(String permissionId) {
         Permission basePermission = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Aucun permission avec id: "+permissionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun permission avec id: " + permissionId));
 
         permissionRepository.delete(basePermission);
     }
@@ -67,7 +72,7 @@ public class PermissionService {
             if (!existingPermissions.contains(permission)) {
                 existingPermissions.add(permission);
                 permission.getRoles().add(role);
-            }else{
+            } else {
                 throw new OperationNotAllowedException("cette permission est déja effectué a ce role!");
             }
         }
